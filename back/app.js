@@ -57,9 +57,5 @@ const createTables = async () => {
 // Appel de la fonction pour créer les tables
 createTables();
 
-// Démarrage du serveur
-app.listen(3001, () => {
-  console.log('Serveur en cours d\'exécution sur le port 3001');
-});
 
 export default app;
