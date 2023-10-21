@@ -19,6 +19,7 @@ export const getRecruiterById = async (req, res) => {
 };
 
 export const createRecruiter = async (req, res) => {
+    console.log('req.body dans createRecruiter:', req.body);
     try {
         const recruiter = await Recruiter.create(req.body);
         res.status(201).json({ id: recruiter.id });
