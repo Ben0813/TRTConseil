@@ -10,15 +10,21 @@ const SignupCandidate = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const url = 'http://localhost:3001/api/candidates';
     try {
-      const response = await axios.post(url, {
+      const response = await axios.post('http://localhost:3001/api/candidates', {
         name,
         firstname,
         email,
         password,
         cv
       });
+  
+      // Si vous générez également un jeton lors de l'inscription, stockez-le.
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("userType", "candidate"); // ou ce qui est approprié
+      }
+  
       console.log('Compte créé avec succès:', response.data);
     } catch (error) {
       console.error('Erreur lors de la création du compte:', error);

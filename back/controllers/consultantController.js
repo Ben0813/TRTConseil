@@ -1,4 +1,6 @@
 import Consultant from "../models/Consultant.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export const getConsultants = async (req, res) => {
     try {
@@ -54,6 +56,31 @@ export const deleteConsultant = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
+
+export const loginConsultant = async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      const consultant = await Consultant.findOne({ where: { email } });
+  
+      if (!consultant || !(await bcrypt.compare(password, consultant.password))) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+  
+      const token = jwt.sign(
+        { id: consultant.id, email: consultant.email },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "1h",
+        }
+      );
+  
+      res.status(200).json({ token, userType: "consultant" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  };
+  
 
 const consultantController = {
     getConsultants,

@@ -1,11 +1,11 @@
 import express from "express";
 const router = express.Router();
 import consultantController from "../controllers/consultantController.js";
-import { hashPassword } from "../middlewares/passwordMiddleware.js";
 
+router.post("/login", consultantController.loginConsultant);
 router.get("/", consultantController.getConsultants);
 router.get("/:id", consultantController.getConsultantById);
-router.post("/", hashPassword, consultantController.createConsultant);
+router.post("/", consultantController.createConsultant);
 router.put("/:id", consultantController.updateConsultant);
 router.delete("/:id", consultantController.deleteConsultant);
 

@@ -1,11 +1,11 @@
 import express from 'express';
 const router = express.Router();
 import administratorController from "../controllers/administratorController.js";
-import { hashPassword } from "../middlewares/passwordMiddleware.js";
 
+router.post('/login', administratorController.loginAdministrator);
 router.get('/', administratorController.getAdministrators);
 router.get('/:id', administratorController.getAdministratorById);
-router.post('/', hashPassword, administratorController.createAdministrator);
+router.post('/', administratorController.createAdministrator);
 router.put('/:id', administratorController.updateAdministrator);
 router.delete('/:id', administratorController.deleteAdministrator);
 

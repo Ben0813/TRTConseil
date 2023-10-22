@@ -1,8 +1,13 @@
 import express from 'express';
 import cors from 'cors';
-import sequelize from './config/database.js';
+import bcrypt from 'bcrypt';
+import session from 'express-session';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
-// Importation des modèles
+dotenv.config();
+
+// Import des modèles
 import Recruiter from './models/Recruiter.js';
 import Candidate from './models/Candidate.js';
 import Consultant from './models/Consultant.js';
@@ -10,7 +15,29 @@ import Administrator from './models/Administrator.js';
 import Job from './models/Job.js';
 import Postulation from './models/Postulation.js';
 
-// Importation des routes
+// Ajout des hooks pour le hachage des mots de passe
+const addHashingHooks = (model) => {
+  model.addHook('beforeCreate', async (user) => {
+    if (user.password) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(user.password, salt);
+    }
+  });
+  
+  model.addHook('beforeUpdate', async (user) => {
+    if (user.password) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(user.password, salt);
+    }
+  });
+};
+
+addHashingHooks(Candidate);
+addHashingHooks(Recruiter);
+addHashingHooks(Consultant);
+addHashingHooks(Administrator);
+
+// Import des routes
 import recruiterRoutes from './routes/recruiters.js';
 import candidateRoutes from './routes/candidates.js';
 import consultantRoutes from './routes/consultants.js';
@@ -23,6 +50,29 @@ const app = express();
 // Configuration des middlewares
 app.use(cors());
 app.use(express.json());
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
+const authenticate = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
+  const token = authHeader.split(' ')[1];
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = payload;
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: 'Invalid token' });
+  }
+};
 
 // Utilisation des routes
 app.use('/api/recruiters', recruiterRoutes);
