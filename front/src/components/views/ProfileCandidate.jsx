@@ -16,7 +16,7 @@ const ProfileCandidate = () => {
   };
 
   const handleApply = (jobId) => {
-    // Votre logique pour postuler à un job ici
+    // logique pour postuler à un job ici
     console.log(`Postulé au job avec l'ID: ${jobId}`);
   };
 
@@ -27,7 +27,7 @@ const ProfileCandidate = () => {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
-      // Faites quelque chose avec les données ici, par exemple, mettez à jour l'état.
+   
       console.log(response.data);
     } catch (error) {
       console.error('Erreur lors de la récupération des données:', error);

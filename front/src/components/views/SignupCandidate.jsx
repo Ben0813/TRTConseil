@@ -19,10 +19,9 @@ const SignupCandidate = () => {
         cv
       });
   
-      // Si vous générez également un jeton lors de l'inscription, stockez-le.
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
-        localStorage.setItem("userType", "candidate"); // ou ce qui est approprié
+        localStorage.setItem("userType", "candidate"); 
       }
   
       console.log('Compte créé avec succès:', response.data);
