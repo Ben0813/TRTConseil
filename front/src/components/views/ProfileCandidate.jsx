@@ -16,7 +16,6 @@ const ProfileCandidate = () => {
   };
 
   const handleApply = (jobId) => {
-    // logique pour postuler à un job ici
     console.log(`Postulé au job avec l'ID: ${jobId}`);
   };
 
@@ -27,7 +26,6 @@ const ProfileCandidate = () => {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
-   
       console.log(response.data);
     } catch (error) {
       console.error('Erreur lors de la récupération des données:', error);
@@ -41,38 +39,41 @@ const ProfileCandidate = () => {
   const jobs = [
     { id: 1, title: "Développeur Frontend" },
     { id: 2, title: "Développeur Backend" },
-    // ...
   ];
 
   return (
-    <div>
-      <div id="profile-section">
+    <div className="flex flex-col items-center bg-gray-900 min-h-screen text-white">
+      <div className="bg-gray-800 p-8 rounded-lg w-full md:w-1/3 my-8">
         <form>
           <input 
             type="text" 
             value={name} 
             onChange={e => setName(e.target.value)} 
-            placeholder="Nom" 
+            placeholder="Nom"
+            className="p-2 rounded bg-gray-700 w-full mb-4" 
           />
           <input 
             type="text" 
             value={firstname} 
             onChange={e => setFirstname(e.target.value)} 
-            placeholder="Prénom" 
+            placeholder="Prénom"
+            className="p-2 rounded bg-gray-700 w-full mb-4" 
           />
           <input 
             type="file" 
             accept="application/pdf" 
             onChange={handleCvUpload} 
+            className="p-2 rounded bg-gray-700 w-full mb-4"
           />
-          <button type="submit">Mettre à jour</button>
+          <button type="submit" className="bg-green-500 p-2 rounded w-full">Mettre à jour</button>
         </form>
       </div>
-      <div id="jobs-section">
+      <div className="bg-gray-800 p-8 rounded-lg w-full md:w-1/3 my-8">
         <ul>
           {jobs.map((job) => (
-            <li key={job.id}>
-              {job.title} <button onClick={() => handleApply(job.id)}>Postuler</button>
+            <li key={job.id} className="flex justify-between mb-4">
+              <span>{job.title}</span> 
+              <button onClick={() => handleApply(job.id)} className="bg-blue-500 p-2 rounded">Postuler</button>
             </li>
           ))}
         </ul>

@@ -24,34 +24,40 @@ const SignupRecruiter = () => {
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Nom"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Prénom"
-          value={firstname}
-          onChange={(e) => setFirstname(e.target.value)}
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Mot de passe"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit">S'inscrire</button>
-      </form>
+    <div className="flex flex-col items-center bg-gray-900 min-h-screen text-white">
+      <div className="bg-gray-800 p-8 rounded-lg w-full md:w-1/3 my-8">
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="Nom"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="p-2 rounded bg-gray-700 w-full mb-4"
+          />
+          <input
+            type="text"
+            placeholder="Prénom"
+            value={firstname}
+            onChange={(e) => setFirstname(e.target.value)}
+            className="p-2 rounded bg-gray-700 w-full mb-4"
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="p-2 rounded bg-gray-700 w-full mb-4"
+          />
+          <input
+            type="password"
+            placeholder="Mot de passe"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="p-2 rounded bg-gray-700 w-full mb-4"
+          />
+          <button type="submit" className="bg-green-500 p-2 rounded w-full">S'inscrire</button>
+        </form>
+      </div>
     </div>
   );
 }
