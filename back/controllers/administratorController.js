@@ -88,6 +88,7 @@ export const deleteAdministrator = async (req, res) => {
         createAdministrator,
         updateAdministrator,
         deleteAdministrator,
+        loginAdministrator,
     };
 
 export default administratorController;

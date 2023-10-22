@@ -89,6 +89,7 @@ const recruiterController = {
     createRecruiter,
     updateRecruiter,
     deleteRecruiter,
+    loginRecruiter,
 };
 
 export default recruiterController;

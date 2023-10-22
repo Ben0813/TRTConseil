@@ -88,6 +88,7 @@ const consultantController = {
     createConsultant,
     updateConsultant,
     deleteConsultant,
+    loginConsultant,
 };
 
 export default consultantController;
