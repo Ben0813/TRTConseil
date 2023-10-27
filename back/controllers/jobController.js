@@ -19,13 +19,22 @@ export const getJobById = async (req, res) => {
 };
 
 export const createJob = async (req, res) => {
+    const { title, location, description, id_recruiter } = req.body;  
     try {
-        const job = await Job.create(req.body);
-        res.status(201).json({ id: job.id });
+      const job = await Job.create({
+        title,
+        location,
+        description,
+        id_recruiter 
+      });
+      res.status(201).json({ id: job.id });
     } catch (err) {
-        res.status(500).json({ message: err.message });
+      console.log("Erreur complète: ", err);  
+      res.status(500).json({ message: err.message });
     }
-};
+  };
+  
+
 
 export const updateJob = async (req, res) => {
     try {

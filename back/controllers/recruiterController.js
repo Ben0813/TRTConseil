@@ -61,6 +61,7 @@ export const deleteRecruiter = async (req, res) => {
 export const loginRecruiter = async (req, res) => {
     try {
       const { email, password } = req.body;
+      console.log("Email:", email, "Password:", password); 
       const recruiter = await Recruiter.findOne({ where: { email } });
   
       if (!recruiter || !(await bcrypt.compare(password, recruiter.password))) {
@@ -68,7 +69,7 @@ export const loginRecruiter = async (req, res) => {
       }
   
       const token = jwt.sign(
-        { id: recruiter.id, email: recruiter.email },
+        { id: recruiter.id, email: recruiter.email, userType: "recruiter" },
         process.env.JWT_SECRET,
         {
           expiresIn: "1h",

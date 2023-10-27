@@ -4,7 +4,7 @@ import Login from './components/views/Login';
 import SignupCandidate from './components/views/SignupCandidate';
 import SignupRecruiter from './components/views/SignupRecruiter';
 import ProfileCandidate from './components/views/ProfileCandidate';
-
+import ProfileRecruiter from './components/views/ProfileRecruiter';
 
 function App() {
   return (
@@ -14,6 +14,7 @@ function App() {
         <Route path="/signup-candidate" element={<SignupCandidate />} />
         <Route path="/signup-recruiter" element={<SignupRecruiter />} />
         <Route path="/profile-candidate" element={<ProfileCandidate />} />
+        <Route path="/profile-recruiter" element={<ProfileRecruiter />} />
       </Routes>
     </div>
   );

@@ -10,6 +10,7 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    console.log("trying to log with", email, password, userType);
     try {
       const endPoint = `http://localhost:3001/api/${userType}s/login`;
       const response = await axios.post(endPoint, {
@@ -19,12 +20,17 @@ const Login = () => {
 
       const { token } = response.data;
       localStorage.setItem('token', token);
+      localStorage.setItem('role', userType);
       localStorage.setItem('userType', userType);
 
       if (userType === 'candidate') {
+        console.log("Navigation to profile-candidate");
         navigate('/profile-candidate');
+        console.log("Should have navigated to profile-candidate");
       } else if (userType === 'recruiter') {
+        console.log("Navigation to profile-recruiter");
         navigate('/profile-recruiter');
+        console.log("Should have navigated to profile-recruiter");
       } else if (userType === 'administrator') {
         navigate('/profile-administrator');
       } else if (userType === 'consultant') {

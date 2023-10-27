@@ -1,10 +1,34 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
+const token = localStorage.getItem('token');
 
 const ProfileCandidate = () => {
   const [name, setName] = React.useState("");
   const [firstname, setFirstname] = React.useState("");
   const [cv, setCv] = React.useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const isAuthenticated = localStorage.getItem("token") !== null;
+    const hasCandidateRole = localStorage.getItem("role") === "candidate";
+    console.log("Is Authenticated:", isAuthenticated);
+    console.log("Has Candidate Role:", hasCandidateRole);
+    if (!isAuthenticated || !hasCandidateRole) {
+      console.log("Redirecting to Home");
+      navigate("/");
+    }
+  }, [navigate]);
+
+  const handleLogout = () => {
+    //remove authentication info from localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+
+    //redirect to logout page
+    navigate("/");
+  };
 
   const handleCvUpload = (e) => {
     const file = e.target.files[0];
@@ -43,6 +67,14 @@ const ProfileCandidate = () => {
 
   return (
     <div className="flex flex-col items-center bg-gray-900 min-h-screen text-white">
+      <div className="mb-8 flex justify-end">
+        <button
+          className="bg-raisin hover:bg-red text-white py-2 px-4 rounded font-rajdhani"
+          onClick={handleLogout}
+        >
+          Déconnexion
+        </button>
+      </div>
       <div className="bg-gray-800 p-8 rounded-lg w-full md:w-1/3 my-8">
         <form>
           <input 
