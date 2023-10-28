@@ -7,6 +7,7 @@ import SignupAdministrator from './components/views/SignupAdministrator';
 import ProfileCandidate from './components/views/ProfileCandidate';
 import ProfileRecruiter from './components/views/ProfileRecruiter';
 import ProfileAdministrator from './components/views/ProfileAdministrator';
+import ProfileConsultant from './components/views/ProfileConsultant';
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
         <Route path="/profile-candidate" element={<ProfileCandidate />} />
         <Route path="/profile-recruiter" element={<ProfileRecruiter />} />
         <Route path="/profile-administrator" element={<ProfileAdministrator />} />
+        <Route path="/profile-consultant" element={<ProfileConsultant />} />
       </Routes>
     </div>
   );
