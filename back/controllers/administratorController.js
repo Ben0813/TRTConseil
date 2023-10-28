@@ -68,7 +68,7 @@ export const deleteAdministrator = async (req, res) => {
           }
       
           const token = jwt.sign(
-            { id: administrator.id, email: administrator.email },
+            { id: administrator.id, email: administrator.email, userType: "administrator" },
             process.env.JWT_SECRET,
             {
               expiresIn: "1h",

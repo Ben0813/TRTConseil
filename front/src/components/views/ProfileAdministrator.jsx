@@ -1,13 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const SignupConsultant = () => {
+const token = localStorage.getItem('token');
+
+const ProfileAdministrator = () => {
   const [name, setName] = useState('');
   const [firstname, setFirstname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  useEffect(() => {
+    const isAuthenticated = localStorage.getItem("token") !== null;
+    const hasAdminRole = localStorage.getItem("role") === "administrator";
+    if (!isAuthenticated || !hasAdminRole) {
+      navigate("/");
+    }
+  }, [navigate]);
+
+    const handleLogout = () => {
+    //remove authentication info from localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+
+    //redirect to logout page
+    navigate("/");
+    };
+
+  const handleCreateConsultant = async (e) => {
     e.preventDefault();
     const url = 'http://localhost:3001/api/consultants';
     try {
@@ -25,8 +46,17 @@ const SignupConsultant = () => {
 
   return (
     <div className="flex flex-col items-center bg-gray-900 min-h-screen text-white">
+           <div className="mb-8 flex justify-end">
+        <button
+          className="bg-raisin hover:bg-red text-white py-2 px-4 rounded font-rajdhani"
+          onClick={handleLogout}
+        >
+          Déconnexion
+        </button>
+        </div>
       <div className="bg-gray-800 p-8 rounded-lg w-full md:w-1/3 my-8">
-        <form onSubmit={handleSubmit}>
+        <h1 className="text-2xl mb-5">Créer un compte consultant</h1>
+        <form onSubmit={handleCreateConsultant}>
         <input
             type="text"
             placeholder="Nom"
@@ -55,11 +85,11 @@ const SignupConsultant = () => {
             onChange={(e) => setPassword(e.target.value)}
             className="p-2 rounded bg-gray-700 w-full mb-4"
           />
-          <button type="submit" className="bg-green-500 p-2 rounded w-full">S'inscrire</button>
+          <button type="submit" className="bg-green-500 p-2 rounded w-full">Créer</button>
         </form>
       </div>
     </div>
   );
 }
 
-export default SignupConsultant;
+export default ProfileAdministrator;

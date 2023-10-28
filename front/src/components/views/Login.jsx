@@ -73,9 +73,6 @@ const Login = () => {
         <button onClick={() => navigate('/signup-administrator')} className="bg-gray-700 text-white p-3 rounded mb-2 sm:mb-0 sm:mr-2">
           Créer Administrateur
         </button>
-        <button onClick={() => navigate('/signup-consultant')} className="bg-gray-700 text-white p-3 rounded mb-2 sm:mb-0">
-          Créer Consultant
-        </button>
       </div>
     </div>
   );
