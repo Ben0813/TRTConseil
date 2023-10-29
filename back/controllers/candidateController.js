@@ -24,8 +24,8 @@ export const createCandidate = async (req, res) => {
   console.log('Entrée dans createCandidate'); 
   console.log('Données reçues:', req.body); 
   
-  const { name, firstname, email, password, cv } = req.body;
-  if (!name || !firstname || !email || !password || !cv) {
+  const { name, firstname, email, password } = req.body;
+  if (!name || !firstname || !email || !password ) {
     return res.status(400).json({ message: 'Tous les champs sont requis.' });
   }
 

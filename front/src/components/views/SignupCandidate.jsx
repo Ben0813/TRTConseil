@@ -11,13 +11,18 @@ const SignupCandidate = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3001/api/candidates', {
+      const data = {
         name,
         firstname,
         email,
         password,
-        cv
-      });
+      };
+  
+      if (cv !== '') {
+        data.cv = cv;
+      }
+  
+      const response = await axios.post('http://localhost:3001/api/candidates', data);
   
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
@@ -60,13 +65,6 @@ const SignupCandidate = () => {
             placeholder="Mot de passe"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="p-2 rounded bg-gray-700 w-full mb-4"
-          />
-          <input
-            type="text"
-            placeholder="CV"
-            value={cv}
-            onChange={(e) => setCv(e.target.value)}
             className="p-2 rounded bg-gray-700 w-full mb-4"
           />
           <button type="submit" className="bg-green-500 p-2 rounded w-full">S'inscrire</button>

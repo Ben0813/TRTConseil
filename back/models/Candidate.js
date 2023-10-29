@@ -29,7 +29,7 @@ Candidate.init(
         },
         cv: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
         },
         isApproved: {
             type: DataTypes.BOOLEAN,
