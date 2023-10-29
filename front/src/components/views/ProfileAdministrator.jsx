@@ -46,14 +46,14 @@ const ProfileAdministrator = () => {
 
   return (
     <div className="flex flex-col items-center bg-gray-900 min-h-screen text-white">
-           <div className="mb-8 flex justify-end">
+      <div className="mb-8 flex justify-end w-full p-4">
         <button
-          className="bg-raisin hover:bg-red text-white py-2 px-4 rounded font-rajdhani"
+          className="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded"
           onClick={handleLogout}
         >
           Déconnexion
         </button>
-        </div>
+      </div>
       <div className="bg-gray-800 p-8 rounded-lg w-full md:w-1/3 my-8">
         <h1 className="text-2xl mb-5">Créer un compte consultant</h1>
         <form onSubmit={handleCreateConsultant}>

@@ -67,9 +67,9 @@ const ProfileCandidate = () => {
 
   return (
     <div className="flex flex-col items-center bg-gray-900 min-h-screen text-white">
-      <div className="mb-8 flex justify-end">
+      <div className="mb-8 flex justify-end w-full p-4">
         <button
-          className="bg-raisin hover:bg-red text-white py-2 px-4 rounded font-rajdhani"
+          className="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded"
           onClick={handleLogout}
         >
           Déconnexion
