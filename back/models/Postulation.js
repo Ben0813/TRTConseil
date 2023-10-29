@@ -6,12 +6,12 @@ class	Postulation	extends	Model	{}
 Postulation.init(
     {
         id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
         },
         id_candidate: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
             allowNull: false,
             references: {
                 model: "candidates",
@@ -19,7 +19,7 @@ Postulation.init(
             },
         },
         id_job: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
             allowNull: false,
             references: {
                 model: "jobs",

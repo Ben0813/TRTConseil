@@ -7,8 +7,8 @@ class Job extends Model {}
 Job.init(
     {
         id: {
-            type: DataTypes.INTEGER,
-            autoIncrement: true,
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
             primaryKey: true,
         },
         title: {
@@ -24,7 +24,7 @@ Job.init(
             allowNull: false,
         },
         id_recruiter: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
             allowNull: false,
             references: {
                 model: Recruiter,

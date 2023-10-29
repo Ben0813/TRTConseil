@@ -21,14 +21,29 @@ export const getRecruiterById = async (req, res) => {
 };
 
 export const createRecruiter = async (req, res) => {
-    console.log('req.body dans createRecruiter:', req.body);
-    try {
-        const recruiter = await Recruiter.create(req.body);
-        res.status(201).json({ id: recruiter.id });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
+    console.log('Entrée dans createRecruiter'); 
+    console.log('Données reçues:', req.body); 
+    
+    const { name, firstname, email, password, cv } = req.body;
+    if (!name || !firstname || !email || !password ) {
+      return res.status(400).json({ message: 'Tous les champs sont requis.' });
     }
-};
+  
+    try {
+      const recruiter = await Recruiter.create({
+        ...req.body,
+        isApproved: false 
+      });
+      res.status(201).json({ id: recruiter.id });
+    } catch (err) {
+      console.log('Erreur:', err); 
+      if (err.name === 'SequelizeUniqueConstraintError') {
+        return res.status(400).json({ message: 'Email déjà utilisé.' });
+      }
+      res.status(500).json({ message: 'Une erreur interne s\'est produite.' });
+    }
+  };
+
 
 export const updateRecruiter = async (req, res) => {
     try {
@@ -61,10 +76,18 @@ export const deleteRecruiter = async (req, res) => {
 export const loginRecruiter = async (req, res) => {
     try {
       const { email, password } = req.body;
-      console.log("Email:", email, "Password:", password); 
       const recruiter = await Recruiter.findOne({ where: { email } });
-  
+
       if (!recruiter || !(await bcrypt.compare(password, recruiter.password))) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+  
+      if (!recruiter.isApproved) {
+        return res.status(401).json({ message: "Your account has not been approved yet" });
+      }
+  
+      const passwordValid = await bcrypt.compare(password, recruiter.password);
+      if (!passwordValid) {
         return res.status(401).json({ message: "Invalid email or password" });
       }
   

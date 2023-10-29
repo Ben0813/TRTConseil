@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import session from 'express-session';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import { Op } from 'sequelize';
 
 dotenv.config();
 
@@ -82,19 +83,65 @@ app.use('/api/administrators', administratorRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/postulations', postulationRoutes);
 
+app.get('/api/pending-accounts', authenticate, async (req, res) => {
+  try {
+    const candidates = await Candidate.findAll();
+    const recruiters = await Recruiter.findAll();
+
+    const pendingAccounts = [
+      ...candidates.map(c => ({ id: c.id, email: c.email, type: 'candidate', isApproved: c.isApproved })),
+      ...recruiters.map(r => ({ id: r.id, email: r.email, type: 'recruiter', isApproved: r.isApproved }))
+    ];
+    
+
+    res.json(pendingAccounts);
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur lors de la récupération des comptes en attente.' });
+  }
+});
+
+app.put('/api/approve-account', authenticate, async (req, res) => {
+  const { id, type, isApproved } = req.body;
+  try {
+    if (type === 'candidate') {
+      await Candidate.update({ isApproved }, { where: { id } });
+    } else if (type === 'recruiter') {
+      await Recruiter.update({ isApproved }, { where: { id } });
+    } else {
+      return res.status(400).json({ error: 'Type de compte inconnu.' });
+    }
+    res.json({ message: 'Statut du compte mis à jour avec succès.' });
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur lors de la mise à jour du statut du compte.' });
+  }
+});
+
+
+app.post('/api/reject-account', authenticate, async (req, res) => {
+  const { id, type } = req.body;
+  try {
+    if (type === 'candidate') {
+      await Candidate.destroy({ where: { id } });
+    } else if (type === 'recruiter') {
+      await Recruiter.destroy({ where: { id } });
+    } else {
+      return res.status(400).json({ error: 'Type de compte inconnu.' });
+    }
+    res.json({ message: 'Compte rejeté avec succès.' });
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur lors du rejet du compte.' });
+  }
+});
+
+
 // Fonction asynchrone pour créer les tables dans un ordre spécifique
 const createTables = async () => {
   try {
-    await Recruiter.sync({ alter: false });
-    console.log('Table Recruiter créée');
-    await Candidate.sync({ alter: false });
-    console.log('Table Candidate créée');
+    await Recruiter.sync({ alter: false  });
+    await Candidate.sync({ alter: false  });
     await Consultant.sync({ alter: false });
-    console.log('Table Consultant créée');
-    await Administrator.sync({ alter: false });
-    console.log('Table Administrator créée');
+    await Administrator.sync({ alter: false});
     await Job.sync({ alter: false });
-    console.log('Table Job créée');
 
     // Créer cette table en dernier à cause de ses dépendances avec les autres
     await Postulation.sync({ alter: false });

@@ -6,8 +6,8 @@ class Recruiter extends Model {}
 Recruiter.init(
     {
         id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
         },
         name: {
@@ -26,6 +26,11 @@ Recruiter.init(
         password: {
             type: DataTypes.STRING(64),
             allowNull: false,
+        },
+        isApproved: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
         },
             },
     {   

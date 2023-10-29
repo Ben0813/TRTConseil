@@ -6,8 +6,8 @@ class Candidate extends Model {}
 Candidate.init(
     {
         id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
         },
 
@@ -30,6 +30,11 @@ Candidate.init(
         cv: {
             type: DataTypes.STRING,
             allowNull: false,
+        },
+        isApproved: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
         },
     },
     {

@@ -21,13 +21,29 @@ export const getCandidateById = async (req, res) => {
 };
 
 export const createCandidate = async (req, res) => {
+  console.log('Entrée dans createCandidate'); 
+  console.log('Données reçues:', req.body); 
+  
+  const { name, firstname, email, password, cv } = req.body;
+  if (!name || !firstname || !email || !password || !cv) {
+    return res.status(400).json({ message: 'Tous les champs sont requis.' });
+  }
+
   try {
-    const candidate = await Candidate.create(req.body);
+    const candidate = await Candidate.create({
+      ...req.body,
+      isApproved: false 
+    });
     res.status(201).json({ id: candidate.id });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.log('Erreur:', err); 
+    if (err.name === 'SequelizeUniqueConstraintError') {
+      return res.status(400).json({ message: 'Email déjà utilisé.' });
+    }
+    res.status(500).json({ message: 'Une erreur interne s\'est produite.' });
   }
 };
+
 
 export const updateCandidate = async (req, res) => {
   try {
@@ -66,6 +82,15 @@ export const loginCandidate = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
+    if (!candidate.isApproved) {
+      return res.status(401).json({ message: "Your account has not been approved yet" });
+    }
+
+    const passwordValid = await bcrypt.compare(password, candidate.password);
+    if (!passwordValid) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
     const token = jwt.sign(
       { id: candidate.id, email: candidate.email, userType: "candidate" },
       process.env.JWT_SECRET,
@@ -80,6 +105,7 @@ export const loginCandidate = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 
 const candidateController = {
   getCandidates,

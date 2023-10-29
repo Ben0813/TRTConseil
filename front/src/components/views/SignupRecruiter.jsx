@@ -9,9 +9,8 @@ const SignupRecruiter = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const url = 'http://localhost:3001/api/recruiters';
     try {
-      const response = await axios.post(url, {
+      const response = await axios.post('http://localhost:3001/api/recruiters', {
         name,
         firstname,
         email,
