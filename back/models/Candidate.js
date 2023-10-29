@@ -27,7 +27,7 @@ Candidate.init(
             type: DataTypes.STRING(64),
             allowNull: false,
         },
-        cv: {
+        cvPath: {
             type: DataTypes.STRING,
             allowNull: true,
         },

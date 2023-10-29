@@ -1,6 +1,7 @@
 import Candidate from "../models/Candidate.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import multer from "multer";
 
 export const getCandidates = async (req, res) => {
   try {
@@ -56,6 +57,18 @@ export const updateCandidate = async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+};
+
+export const uploadCV = async (req, res) => {
+  const { id } = req.user; 
+  const cvPath = req.file.path;
+
+  try {
+    await Candidate.update({ cvPath }, { where: { id } });
+    res.status(200).json({ message: 'CV uploadé avec succès.' });
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur lors de l’upload du CV.' });
   }
 };
 

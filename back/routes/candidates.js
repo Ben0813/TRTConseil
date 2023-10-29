@@ -8,5 +8,6 @@ router.get("/:id", candidateController.getCandidateById);
 router.post("/", candidateController.createCandidate);
 router.put("/:id", candidateController.updateCandidate);
 router.delete("/:id", candidateController.deleteCandidate);
+router.put('/update-cv', upload.single('cv'), uploadCV);
 
 export default router;

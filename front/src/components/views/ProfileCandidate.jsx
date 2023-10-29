@@ -39,6 +39,27 @@ const ProfileCandidate = () => {
     }
   };
 
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+  
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("firstname", firstname);
+    formData.append("cv", cv);
+  
+    try {
+      const response = await axios.put('http://localhost:3001/api/candidates/update-cv', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      console.log("CV uploadé avec succès", response.data);
+    } catch (error) {
+      console.error("Erreur lors de l'upload du CV:", error);
+    }
+  };
+  
   const handleApply = (jobId) => {
     console.log(`Postulé au job avec l'ID: ${jobId}`);
   };
@@ -76,7 +97,7 @@ const ProfileCandidate = () => {
         </button>
       </div>
       <div className="bg-gray-800 p-8 rounded-lg w-full md:w-1/3 my-8">
-        <form>
+      <form onSubmit={handleFormSubmit}>
           <input 
             type="text" 
             value={name} 
@@ -97,7 +118,7 @@ const ProfileCandidate = () => {
             onChange={handleCvUpload} 
             className="p-2 rounded bg-gray-700 w-full mb-4"
           />
-          <button type="submit" className="bg-green-500 p-2 rounded w-full">Mettre à jour</button>
+           <button type="submit" className="bg-green-500 p-2 rounded w-full">Mettre à jour</button>
         </form>
       </div>
       <div className="bg-gray-800 p-8 rounded-lg w-full md:w-1/3 my-8">
