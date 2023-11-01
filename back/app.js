@@ -126,6 +126,29 @@ app.post('/api/reject-account', authenticate, async (req, res) => {
   }
 });
 
+app.get('/api/pending-jobs', authenticate, async (req, res) => {
+  try {
+    const jobs = await Job.findAll();
+    res.json(jobs);
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur lors de la récupération des jobs.' });
+  }
+});
+
+
+app.put('/api/approve-job', authenticate, async (req, res) => {
+  const { id, isApproved } = req.body;
+  try {
+    await Job.update({ isApproved }, { where: { id } });
+    res.json({ message: 'Statut du job mis à jour avec succès.' });
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur lors de la mise à jour du statut du job.' });
+  }
+});
+
+
+
+
 
 // Fonction asynchrone pour créer les tables dans un ordre spécifique
 const createTables = async () => {

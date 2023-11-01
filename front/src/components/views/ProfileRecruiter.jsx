@@ -101,7 +101,8 @@ useEffect(() => {
       title: jobTitle,
       location: jobLocation,
       description: jobDescription,
-      id_recruiter: recruiterId
+      id_recruiter: recruiterId,
+      isApproved: false
     };
     try {
       const response = await axios.post('http://localhost:3001/api/jobs', payload, {

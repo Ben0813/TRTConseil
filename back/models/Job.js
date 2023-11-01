@@ -23,6 +23,11 @@ Job.init(
             type: DataTypes.STRING,
             allowNull: false,
         },
+        isApproved: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
         id_recruiter: {
             type: DataTypes.UUID,
             allowNull: false,

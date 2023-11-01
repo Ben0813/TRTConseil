@@ -6,6 +6,7 @@ const ProfileConsultant = () => {
   const [pendingAccounts, setPendingAccounts] = useState([]);
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
+  const [pendingJobs, setPendingJobs] = useState([]);
 
   useEffect(() => {
     const isAuthenticated = localStorage.getItem("token") !== null;
@@ -30,6 +31,23 @@ const ProfileConsultant = () => {
     };
 
     fetchPendingAccounts();
+  }, [token]);
+
+  useEffect(() => {
+    const fetchPendingJobs = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/api/pending-jobs', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        setPendingJobs(response.data);
+      } catch (error) {
+        console.error('Erreur lors du chargement des jobs en attente:', error);
+      }
+    };
+
+    fetchPendingJobs();
   }, [token]);
 
   const handleLogout = () => {
@@ -60,6 +78,26 @@ const ProfileConsultant = () => {
     }
   };
   
+  const toggleJobApproval = async (id, isApproved) => {
+    try {
+      const response = await axios.put('http://localhost:3001/api/approve-job', {
+        id,
+        isApproved: !isApproved
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+  
+      if (response.status === 200) {
+        setPendingJobs(pendingJobs.map(job => 
+          job.id === id ? { ...job, isApproved: !isApproved } : job
+        ));
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'approbation du job:', error);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center bg-gray-900 min-h-screen text-white">
@@ -91,8 +129,29 @@ const ProfileConsultant = () => {
           })}
         </ul>
       </div>
+      <div className="bg-gray-800 p-8 rounded-lg w-full md:w-1/3 my-8">
+        <h1 className="text-2xl mb-5">Jobs en attente de validation</h1>
+        <ul className="list-inside list-disc">
+          {pendingJobs.map((job) => {
+          const buttonColor = job.isApproved ? "bg-green-500" : "bg-red-500";
+          const buttonText = job.isApproved ? "Approuvé" : "Non approuvé";
+          return (
+            <li key={job.id} className="mb-4">
+              {job.title}
+              <button 
+                className={`${buttonColor} hover:bg-green-700 text-white py-1 px-2 rounded ml-2`}
+                onClick={() => toggleJobApproval(job.id, job.isApproved)}
+             >
+              {buttonText}
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+  </div>
     </div>
   );
 };
+
 
 export default ProfileConsultant;
