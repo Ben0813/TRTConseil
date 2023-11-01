@@ -3,12 +3,14 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import multer from "multer";
 
+
+// Configuration de Multer pour le stockage des fichiers
 const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
+  destination: function (req, file, cb) {
     cb(null, './uploads/');
   },
-  filename: function(req, file, cb) {
-    cb(null, new Date().toISOString() + '-' + file.originalname);
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + file.originalname);
   }
 });
 
@@ -57,19 +59,31 @@ export const createCandidate = async (req, res) => {
 };
 
 
+// Méthode updateCandidate
 export const updateCandidate = async (req, res) => {
   try {
-    const candidate = await Candidate.findByPk(req.params.id);
-    if (candidate) {
-      await candidate.update(req.body);
-      res.status(200).json({ id: candidate.id });
-    } else {
-      res.status(404).json({ message: "Candidate not found" });
+    const { id } = req.params;
+    const { name, firstname } = req.body;
+    const cv = req.file;
+
+    const candidate = await Candidate.findByPk(id);
+
+    if (!candidate) {
+      return res.status(404).json({ message: "Candidat non trouvé" });
     }
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+
+    if (name) candidate.name = name;
+    if (firstname) candidate.firstname = firstname;
+    if (cv) candidate.cvPath = cv.path;
+
+    await candidate.save();
+    res.status(200).json({ message: "Profil mis à jour avec succès", candidate });
+  } catch (error) {
+    res.status(500).json({ error: "Erreur lors de la mise à jour du profil" });
   }
 };
+
+
 
 export const uploadCV = async (req, res) => {
   const { id } = req.user; 
@@ -123,7 +137,7 @@ export const loginCandidate = async (req, res) => {
       }
     );
 
-    res.status(200).json({ token, userType: "candidate" });
+    res.status(200).json({ token, userType: "candidate", id: candidate.id });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal Server Error" });

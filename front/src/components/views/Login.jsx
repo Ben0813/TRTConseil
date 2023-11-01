@@ -18,10 +18,15 @@ const Login = () => {
         password,
       });
 
-      const { token } = response.data;
+      console.log("Réponse de l'API: ", response.data);
+      
+      const { token, id } = response.data;
       localStorage.setItem('token', token);
       localStorage.setItem('role', userType);
       localStorage.setItem('userType', userType);
+      localStorage.setItem('id', id);
+      console.log("ID stocké dans le localStorage: ", id);
+
 
       if (userType === 'candidate') {
         console.log("Navigation to profile-candidate");

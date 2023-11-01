@@ -5,6 +5,10 @@ import session from 'express-session';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { Op } from 'sequelize';
+import authenticate from "./middleware/authenticate.js";
+
+
+
 
 dotenv.config();
 
@@ -26,12 +30,14 @@ const addHashingHooks = (model) => {
   });
   
   model.addHook('beforeUpdate', async (user) => {
-    if (user.password) {
+    if (user.changed('password')) {
       const salt = await bcrypt.genSalt(10);
       user.password = await bcrypt.hash(user.password, salt);
     }
   });
 };
+  
+
 
 addHashingHooks(Candidate);
 addHashingHooks(Recruiter);
@@ -60,20 +66,7 @@ app.use(
   })
 );
 
-const authenticate = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    return res.status(401).json({ message: 'No token provided' });
-  }
-  const token = authHeader.split(' ')[1];
-  try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = payload;
-    next();
-  } catch (err) {
-    return res.status(401).json({ message: 'Invalid token' });
-  }
-};
+
 
 // Utilisation des routes
 app.use('/api/recruiters', recruiterRoutes);
@@ -137,14 +130,15 @@ app.post('/api/reject-account', authenticate, async (req, res) => {
 // Fonction asynchrone pour créer les tables dans un ordre spécifique
 const createTables = async () => {
   try {
-    await Recruiter.sync({ alter: false  });
-    await Candidate.sync({ alter: false  });
-    await Consultant.sync({ alter: false });
-    await Administrator.sync({ alter: false});
-    await Job.sync({ alter: false });
+    await Recruiter.sync({ alter: true  });
+    await Candidate.sync({ alter: true  });
+    await Consultant.sync({ alter: true });
+    await Administrator.sync({ alter: true});
+    await Job.sync({ alter: true });
+    
 
     // Créer cette table en dernier à cause de ses dépendances avec les autres
-    await Postulation.sync({ alter: false });
+    await Postulation.sync({ alter: true });
     console.log('Table Postulation créée');
   } catch (error) {
     console.log(`Erreur lors de la création des tables : ${error}`);

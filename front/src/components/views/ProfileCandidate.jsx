@@ -1,32 +1,34 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const token = localStorage.getItem('token');
-
 const ProfileCandidate = () => {
-  const [name, setName] = React.useState("");
-  const [firstname, setFirstname] = React.useState("");
-  const [cv, setCv] = React.useState(null);
+  const [name, setName] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [cv, setCv] = useState(null);
+  const [id, setId] = useState(localStorage.getItem("id"));
+  console.log("État actuel de name:", name);
+console.log("État actuel de firstname:", firstname);
+console.log("État actuel de cv:", cv);
+
+  
+  
+  console.log("ID depuis le localStorage dans ProfileCandidate: ", localStorage.getItem('id'));
+
   const navigate = useNavigate();
 
   useEffect(() => {
     const isAuthenticated = localStorage.getItem("token") !== null;
     const hasCandidateRole = localStorage.getItem("role") === "candidate";
-    console.log("Is Authenticated:", isAuthenticated);
-    console.log("Has Candidate Role:", hasCandidateRole);
     if (!isAuthenticated || !hasCandidateRole) {
-      console.log("Redirecting to Home");
       navigate("/");
     }
   }, [navigate]);
 
   const handleLogout = () => {
-    //remove authentication info from localStorage
     localStorage.removeItem("token");
     localStorage.removeItem("role");
-
-    //redirect to logout page
+    localStorage.removeItem("id");
     navigate("/");
   };
 
@@ -39,26 +41,38 @@ const ProfileCandidate = () => {
     }
   };
 
+  const updateProfile = async (id, dataToUpdate) => {
+    try {
+      const response = await axios.put(`http://localhost:3001/api/candidates/${id}`, dataToUpdate, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+    
+      if (response.status === 200) {
+        console.log("Profil mis à jour avec succès", response.data);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du profil:", error);
+    }
+  };
+  
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-  
     const formData = new FormData();
     formData.append("name", name);
     formData.append("firstname", firstname);
     formData.append("cv", cv);
-  
-    try {
-      const response = await axios.put('http://localhost:3001/api/candidates/update-cv', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      console.log("CV uploadé avec succès", response.data);
-    } catch (error) {
-      console.error("Erreur lors de l'upload du CV:", error);
+    
+    if (!id) {
+      console.error("ID n'est pas défini. Impossible de continuer.");
+      return;
     }
+  
+    updateProfile(id, formData);
   };
+  
   
   const handleApply = (jobId) => {
     console.log(`Postulé au job avec l'ID: ${jobId}`);
