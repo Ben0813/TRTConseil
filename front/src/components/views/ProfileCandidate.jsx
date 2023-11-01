@@ -7,9 +7,8 @@ const ProfileCandidate = () => {
   const [firstname, setFirstname] = useState("");
   const [cv, setCv] = useState(null);
   const [id, setId] = useState(localStorage.getItem("id"));
-  console.log("État actuel de name:", name);
-console.log("État actuel de firstname:", firstname);
-console.log("État actuel de cv:", cv);
+  const [approvedJobs, setApprovedJobs] = useState([]);
+
 
   
   
@@ -24,6 +23,24 @@ console.log("État actuel de cv:", cv);
       navigate("/");
     }
   }, [navigate]);
+
+  useEffect(() => {
+    const fetchApprovedJobs = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/api/approved-jobs', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        setApprovedJobs(response.data);
+      } catch (error) {
+        console.error('Erreur lors du chargement des jobs validés:', error);
+      }
+    };
+  
+    fetchApprovedJobs();
+  }, []);
+  
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -74,9 +91,24 @@ console.log("État actuel de cv:", cv);
   };
   
   
-  const handleApply = (jobId) => {
-    console.log(`Postulé au job avec l'ID: ${jobId}`);
+  const handleApply = async (jobId) => {
+    try {
+      const response = await axios.post('http://localhost:3001/api/postulations', {
+        id_candidate: id,
+        id_job: jobId
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (response.status === 200) {
+        console.log('Postulation réussie');
+      }
+    } catch (error) {
+      console.error('Erreur lors de la postulation:', error);
+    }
   };
+  
 
   const fetchData = async () => {
     try {
@@ -94,11 +126,6 @@ console.log("État actuel de cv:", cv);
   useEffect(() => {
     fetchData();
   }, []);
-
-  const jobs = [
-    { id: 1, title: "Développeur Frontend" },
-    { id: 2, title: "Développeur Backend" },
-  ];
 
   return (
     <div className="flex flex-col items-center bg-gray-900 min-h-screen text-white">
@@ -136,17 +163,34 @@ console.log("État actuel de cv:", cv);
         </form>
       </div>
       <div className="bg-gray-800 p-8 rounded-lg w-full md:w-1/3 my-8">
-        <ul>
-          {jobs.map((job) => (
-            <li key={job.id} className="flex justify-between mb-4">
-              <span>{job.title}</span> 
-              <button onClick={() => handleApply(job.id)} className="bg-blue-500 p-2 rounded">Postuler</button>
-            </li>
-          ))}
-        </ul>
-      </div>
+  <h1 className="text-2xl mb-5">Jobs validés</h1>
+  <ul className="list-inside list-disc">
+    {approvedJobs.map((job) => (
+    <li key={job.id} className="mb-4">
+    <div>
+      <strong>Titre : </strong> {job.title}
     </div>
+    <div>
+      <strong>Description : </strong> {job.description}
+    </div>
+    <div>
+      <strong>Lieu : </strong> {job.location}
+    </div>
+    <div>
+      <button
+          className="bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded ml-2"
+          onClick={() => handleApply(job.id)}
+        >
+          Postuler
+        </button>
+    </div>
+      </li>
+    ))}
+  </ul>
+</div>
+
+</div>
   );
-}
+};
 
 export default ProfileCandidate;

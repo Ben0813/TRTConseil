@@ -7,6 +7,8 @@ const ProfileConsultant = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
   const [pendingJobs, setPendingJobs] = useState([]);
+  const [pendingPostulations, setPendingPostulations] = useState([]);
+
 
   useEffect(() => {
     const isAuthenticated = localStorage.getItem("token") !== null;
@@ -49,6 +51,25 @@ const ProfileConsultant = () => {
 
     fetchPendingJobs();
   }, [token]);
+
+  useEffect(() => {
+    const fetchPendingPostulations = async () => {
+        try {
+            const response = await axios.get('http://localhost:3001/api/pending-postulations', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setPendingPostulations(response.data);
+        } catch (error) {
+            console.error('Erreur lors du chargement des postulations en attente:', error);
+        }
+    };
+  
+    fetchPendingPostulations();
+  }, [token]);
+  
+
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -98,6 +119,29 @@ const ProfileConsultant = () => {
       console.error('Erreur lors de l\'approbation du job:', error);
     }
   };
+
+  const togglePostulationApproval = async (id, isApproved) => {
+    try {
+      const response = await axios.put('http://localhost:3001/api/approve-postulation', {
+        id,
+        isApproved: !isApproved
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+  
+      if (response.status === 200) {
+        setPendingPostulations(prevState => prevState.map(postulation => 
+          postulation.id === id ? { ...postulation, isApproved: !isApproved } : postulation
+        ));
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'approbation de la postulation:', error);
+    }
+  };
+  
+
 
   return (
     <div className="flex flex-col items-center bg-gray-900 min-h-screen text-white">
@@ -149,6 +193,27 @@ const ProfileConsultant = () => {
       })}
     </ul>
   </div>
+  <div className="bg-gray-800 p-8 rounded-lg w-full md:w-1/3 my-8">
+    <h1 className="text-2xl mb-5">Postulations en attente de validation</h1>
+    <ul className="list-inside list-disc">
+      {pendingPostulations.map((postulation) => {
+        const buttonColor = postulation.isApproved ? "bg-green-500" : "bg-red-500";
+        const buttonText = postulation.isApproved ? "Approuvé" : "Non approuvé";
+        return (
+          <li key={postulation.id} className="mb-4">
+            Candidat ID: {postulation.id_candidate}, Job ID: {postulation.id_job}
+            <button 
+              className={`${buttonColor} hover:bg-green-700 text-white py-1 px-2 rounded ml-2`}
+              onClick={() => togglePostulationApproval(postulation.id, postulation.isApproved)}
+            >
+              {buttonText}
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+</div>
+
     </div>
   );
 };

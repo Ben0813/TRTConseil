@@ -6,9 +6,9 @@ class	Postulation	extends	Model	{}
 Postulation.init(
     {
         id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        primaryKey: true,
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
+            primaryKey: true,
         },
         id_candidate: {
             type: DataTypes.UUID,
@@ -26,11 +26,20 @@ Postulation.init(
                 key: "id",
             },
         },
+        isApproved: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
+        cvPath: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        }
     },
     {
         sequelize,
         tableName: "postulations",
     },
-    );
-    
-    export default Postulation;
+);
+
+export default Postulation;

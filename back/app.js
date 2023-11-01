@@ -6,6 +6,8 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { Op } from 'sequelize';
 import authenticate from "./middleware/authenticate.js";
+import nodemailer from 'nodemailer';
+
 
 
 
@@ -43,6 +45,15 @@ addHashingHooks(Candidate);
 addHashingHooks(Recruiter);
 addHashingHooks(Consultant);
 addHashingHooks(Administrator);
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
 
 // Import des routes
 import recruiterRoutes from './routes/recruiters.js';
@@ -143,6 +154,98 @@ app.put('/api/approve-job', authenticate, async (req, res) => {
     res.json({ message: 'Statut du job mis à jour avec succès.' });
   } catch (error) {
     res.status(500).json({ error: 'Erreur lors de la mise à jour du statut du job.' });
+  }
+});
+
+app.get('/api/approved-jobs', authenticate, async (req, res) => {
+  try {
+    const jobs = await Job.findAll({ where: { isApproved: true } });
+    res.json(jobs);
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur lors de la récupération des jobs validés.' });
+  }
+});
+
+app.post('/api/postulations', authenticate, async (req, res) => {
+  const { id_candidate, id_job } = req.body;
+  try {
+    const newPostulation = await Postulation.create({ id_candidate, id_job });
+    res.status(200).json(newPostulation);
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur lors de la création de la postulation.' });
+  }
+});
+
+app.get('/api/pending-postulations', authenticate, async (req, res) => {
+  try {
+      const postulations = await Postulation.findAll();
+      res.json(postulations);
+  } catch (error) {
+      res.status(500).json({ error: 'Erreur lors de la récupération des postulations.' });
+  }
+});
+
+app.put('/api/approve-postulation', authenticate, async (req, res) => {
+  const { id, isApproved } = req.body;
+  try {
+    await Postulation.update({ isApproved }, { where: { id } });
+
+    // Récupérer des informations supplémentaires pour l'e-mail
+    const postulation = await Postulation.findByPk(id, {
+      include: [
+        {
+          model: Job,
+          as: 'job',
+          include: [
+            {
+              model: Recruiter,
+              as: 'recruiter'
+            }
+          ]
+        },
+        {
+          model: Candidate,
+          as: 'candidate'
+        }
+      ]
+    });
+
+    // Déclaration des variables
+    const recruiterEmail = postulation.job.recruiter.email;
+    const candidateName = `${postulation.candidate.firstName} ${postulation.candidate.lastName}`;
+    const candidateCV = postulation.candidate.cvPath;
+
+    // Logs pour le diagnostic
+    console.log("Recruiter Email:", recruiterEmail);
+    console.log("Candidate Name:", candidateName);
+    console.log("Candidate CV:", candidateCV);
+
+    // Préparation de l'e-mail
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: recruiterEmail,
+      subject: 'Postulation approuvée',
+      text: `La postulation de ${candidateName} a été approuvée.`,
+      attachments: [
+        {
+          path: candidateCV
+        }
+      ]
+    };
+
+    // Envoi de l'e-mail
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+    });
+
+    res.json({ message: 'Postulation mise à jour avec succès.' });
+  } catch (error) {
+    console.log("Erreur détaillée:", error);
+    res.status(500).json({ error: 'Erreur lors de la mise à jour de la postulation.' });
   }
 });
 
