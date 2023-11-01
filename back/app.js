@@ -183,13 +183,18 @@ app.get('/api/postulations/byJob/:jobId', async (req, res) => {
     const jobId = req.params.jobId;
     const postulations = await Postulation.findAll({
       where: { id_job: jobId },
-      include: Candidate 
+      include: [
+        { model: Candidate, attributes: ['name'] },
+        { model: Job, attributes: ['title'] }
+      ]
     });
     res.json(postulations);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erreur lors de la récupération des postulations.' });
   }
 });
+
 
 
 app.post('/api/postulations', authenticate, async (req, res) => {

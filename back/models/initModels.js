@@ -1,6 +1,7 @@
 import Candidate from './Candidate.js';
 import Job from './Job.js';
 import Postulation from './Postulation.js';
+import Recruiter from './Recruiter.js';
 
 Candidate.hasMany(Postulation, {
   foreignKey: 'id_candidate',

@@ -192,27 +192,23 @@ useEffect(() => {
       </div>
   
       <div className="bg-gray-800 p-5 rounded shadow-lg w-full md:w-1/2 mx-auto mt-10">
-        <h1 className="text-white text-2xl mb-5">Candidats ayant postulé</h1>
-        <ul>
-  {jobs && jobs.length > 0 ? jobs.map((job, index) => (
-    <li key={index}>
-      {job.title}
-      <ul>
-        {job.postulations && job.postulations.length > 0 ? job.postulations.map((postulation, pIndex) => (
-          <li key={pIndex}>
-            {postulation.candidate.name} a postulé pour ce job
-          </li>
-        )) : "Aucune postulation pour ce job"}
-      </ul>
-    </li>
-  )) : "Aucun job trouvé"}
-</ul>
+    <h1 className="text-white text-2xl mb-5">Candidats ayant postulé</h1>
+    <ul>
+        {jobs && jobs.length > 0 ? jobs.map((job, index) => (
+            <li key={index}>
+                {job.title}
+                <ul>
+                    {job.postulations && job.postulations.length > 0 ? job.postulations.map((postulation, pIndex) => (
+                        <li key={pIndex}>
+                            {postulation.Candidate && postulation.Candidate.name ? postulation.Candidate.name : 'Inconnu'} a postulé pour le poste {job.title}
+                        </li>
+                    )) : "Aucune postulation pour ce job"}
+                </ul>
+            </li>
+        )) : "Aucun job trouvé"}
+    </ul>
+</div>
 
-
-
-
-
-      </div>
     </div>
   );
 };
