@@ -71,14 +71,23 @@ useEffect(() => {
         fetchCandidates();
       }, []);
 
-useEffect(() => {
-  const fetchJobsByRecruiter = async () => {
-    const response = await axios.get(`http://localhost:3001/api/jobs/byRecruiter/${recruiterId}`);
-    setJobs(response.data);
-  };
-  fetchJobsByRecruiter();
-}, [recruiterId]);
-
+      useEffect(() => {
+        const fetchJobsByRecruiter = async () => {
+          const response = await axios.get(`http://localhost:3001/api/jobs/byRecruiter/${recruiterId}`);
+          // Fetch postulations for each job
+          const jobsWithPostulations = await Promise.all(
+            response.data.map(async job => {
+              const postulationsResponse = await axios.get(`http://localhost:3001/api/postulations/byJob/${job.id}`);
+              return {
+                ...job,
+                postulations: postulationsResponse.data
+              };
+            })
+          );
+          setJobs(jobsWithPostulations);
+        };
+        fetchJobsByRecruiter();
+      }, [recruiterId]);
 
   const updateRecruiterProfile = async () => {
     try {
@@ -185,26 +194,20 @@ useEffect(() => {
       <div className="bg-gray-800 p-5 rounded shadow-lg w-full md:w-1/2 mx-auto mt-10">
         <h1 className="text-white text-2xl mb-5">Candidats ayant postulé</h1>
         <ul>
-          {candidates.map((candidate, index) => (
-            <li key={index} className="text-white border-b pb-2 pt-2">
-              {candidate.name} a postulé pour {candidate.jobTitle}
-            </li>
-          ))}
-        </ul>
-        <ul>
-  {jobs.filter(job => job.postulations && job.postulations.length > 0).map((job, index) => (
+  {jobs && jobs.length > 0 ? jobs.map((job, index) => (
     <li key={index}>
       {job.title}
       <ul>
-  {candidates.map((candidate, index) => (
-    <li key={index} className="text-white border-b pb-2 pt-2">
-      {candidate.name} a postulé pour {candidate.Job ? candidate.Job.title : 'Non spécifié'}
+        {job.postulations && job.postulations.length > 0 ? job.postulations.map((postulation, pIndex) => (
+          <li key={pIndex}>
+            {postulation.candidate.name} a postulé pour ce job
+          </li>
+        )) : "Aucune postulation pour ce job"}
+      </ul>
     </li>
-  ))}
+  )) : "Aucun job trouvé"}
 </ul>
-    </li>
-  ))}
-</ul>
+
 
 
 
