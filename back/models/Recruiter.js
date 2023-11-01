@@ -28,11 +28,11 @@ Recruiter.init(
             allowNull: false,
         },
 
-        adress: {
+        address: {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        
+
         password: {
             type: DataTypes.STRING(64),
             allowNull: false,
