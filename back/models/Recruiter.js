@@ -23,6 +23,16 @@ Recruiter.init(
             allowNull: false,
             unique: true,
         },
+        company: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+
+        adress: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        
         password: {
             type: DataTypes.STRING(64),
             allowNull: false,
