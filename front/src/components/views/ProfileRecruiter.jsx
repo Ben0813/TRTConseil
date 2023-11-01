@@ -71,6 +71,15 @@ useEffect(() => {
         fetchCandidates();
       }, []);
 
+useEffect(() => {
+  const fetchJobsByRecruiter = async () => {
+    const response = await axios.get(`http://localhost:3001/api/jobs/byRecruiter/${recruiterId}`);
+    setJobs(response.data);
+  };
+  fetchJobsByRecruiter();
+}, [recruiterId]);
+
+
   const updateRecruiterProfile = async () => {
     try {
       const payload = {
@@ -182,6 +191,24 @@ useEffect(() => {
             </li>
           ))}
         </ul>
+        <ul>
+  {jobs.filter(job => job.postulations && job.postulations.length > 0).map((job, index) => (
+    <li key={index}>
+      {job.title}
+      <ul>
+  {candidates.map((candidate, index) => (
+    <li key={index} className="text-white border-b pb-2 pt-2">
+      {candidate.name} a postulé pour {candidate.Job ? candidate.Job.title : 'Non spécifié'}
+    </li>
+  ))}
+</ul>
+    </li>
+  ))}
+</ul>
+
+
+
+
       </div>
     </div>
   );

@@ -9,9 +9,6 @@ import authenticate from "./middleware/authenticate.js";
 import nodemailer from 'nodemailer';
 
 
-
-
-
 dotenv.config();
 
 // Import des modèles
@@ -21,6 +18,8 @@ import Consultant from './models/Consultant.js';
 import Administrator from './models/Administrator.js';
 import Job from './models/Job.js';
 import Postulation from './models/Postulation.js';
+
+import './models/initModels.js';
 
 // Ajout des hooks pour le hachage des mots de passe
 const addHashingHooks = (model) => {
@@ -166,6 +165,33 @@ app.get('/api/approved-jobs', authenticate, async (req, res) => {
   }
 });
 
+
+app.get('/api/jobs/byRecruiter/:recruiterId', async (req, res) => {
+  try {
+    const recruiterId = req.params.recruiterId;
+    const jobs = await Job.findAll({
+      where: { id_recruiter: recruiterId },
+    });
+    res.json(jobs);
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur lors de la récupération des jobs.' });
+  }
+});
+
+app.get('/api/postulations/byJob/:jobId', async (req, res) => {
+  try {
+    const jobId = req.params.jobId;
+    const postulations = await Postulation.findAll({
+      where: { id_job: jobId },
+      include: Candidate 
+    });
+    res.json(postulations);
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur lors de la récupération des postulations.' });
+  }
+});
+
+
 app.post('/api/postulations', authenticate, async (req, res) => {
   const { id_candidate, id_job } = req.body;
   try {
@@ -178,12 +204,26 @@ app.post('/api/postulations', authenticate, async (req, res) => {
 
 app.get('/api/pending-postulations', authenticate, async (req, res) => {
   try {
-      const postulations = await Postulation.findAll();
-      res.json(postulations);
+    const postulations = await Postulation.findAll({
+      include: [
+        {
+          model: Candidate,
+          attributes: ['name'],  
+          as: 'candidate' 
+        },
+        {
+          model: Job,
+          attributes: ['title'],  
+          as: 'job' 
+        }
+      ]
+    });
+    res.json(postulations);
   } catch (error) {
-      res.status(500).json({ error: 'Erreur lors de la récupération des postulations.' });
+    res.status(500).json({ error: 'Erreur lors de la récupération des postulations.' });
   }
 });
+
 
 app.put('/api/approve-postulation', authenticate, async (req, res) => {
   const { id, isApproved } = req.body;
@@ -209,6 +249,20 @@ app.put('/api/approve-postulation', authenticate, async (req, res) => {
         }
       ]
     });
+
+    const postulations = await Postulation.findAll({
+      where: { id_job: jobId },
+      include: [
+        Candidate, 
+        {
+          model: Job,
+          attributes: ['title'] 
+        }
+      ]
+    });
+    
+    
+    
 
     // Déclaration des variables
     const recruiterEmail = postulation.job.recruiter.email;
