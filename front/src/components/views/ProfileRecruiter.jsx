@@ -14,6 +14,9 @@ const ProfileRecruiter = () => {
     const [recruiterId, setRecruiterId] = useState(localStorage.getItem('id'));
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const [updateStatus, setUpdateStatus] = useState('');
+    const [postStatus, setPostStatus] = useState('');
+
 
     useEffect(() => {
         const isAuthenticated = localStorage.getItem("token") !== null;
@@ -112,9 +115,11 @@ const ProfileRecruiter = () => {
         }
       });
       if (response.status === 200) {
+        setUpdateStatus('Profil mis à jour avec succès.');
         console.log("Profil de recruteur mis à jour avec succès", response.data);
       }
     } catch (error) {
+      setUpdateStatus("Erreur lors de la mise à jour du profil. Veuillez réessayer.");
       console.error("Erreur lors de la mise à jour du profil de recruteur:", error);
     }
   };
@@ -139,9 +144,13 @@ const ProfileRecruiter = () => {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
-      console.log('Annonce publiée avec succès:', response.data);
+      if (response.status === 201) {
+        setPostStatus('Annonce publiée avec succès.');
+        console.log('Annonce publiée avec succès:', response.data);
+      }
     } catch (error) {
-      console.error('Erreur lors de la publication de l\'annonce:', error);
+      setPostStatus("Erreur lors de la publication de l'annonce. Veuillez réessayer.");
+      console.error("Erreur lors de la publication de l'annonce:", error);
     }
   };
 
@@ -172,6 +181,7 @@ const ProfileRecruiter = () => {
             value={address}
             onChange={(e) => setAddress(e.target.value)}
           />
+          <p className="text-yellow-300">{updateStatus}</p>
           <button className="bg-green-500 text-white p-2 rounded" type="submit">Mettre à jour</button>
         </form>
       </div>
@@ -198,6 +208,7 @@ const ProfileRecruiter = () => {
             value={jobDescription}
             onChange={(e) => setJobDescription(e.target.value)}
           />
+           <p className="text-yellow-300">{postStatus}</p>
           <button className="bg-green-500 text-white p-2 rounded" type="submit">Publier</button>
         </form>
       </div>
