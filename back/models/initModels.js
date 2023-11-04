@@ -1,3 +1,4 @@
+import e from 'express';
 import Candidate from './Candidate.js';
 import Job from './Job.js';
 import Postulation from './Postulation.js';
@@ -24,3 +25,12 @@ Postulation.belongsTo(Job, {
 });
 
 
+Job.belongsTo(Recruiter, { 
+  as: 'recruiter', 
+  foreignKey: 'id_recruiter' 
+});
+
+Recruiter.hasMany(Job, { 
+  as: 'jobs', 
+  foreignKey: 'id_recruiter' 
+});

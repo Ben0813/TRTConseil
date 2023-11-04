@@ -255,24 +255,26 @@ app.put('/api/approve-postulation', authenticate, async (req, res) => {
         }
       ]
     });
+    console.log(JSON.stringify(postulation, null, 2));
 
-    const postulations = await Postulation.findAll({
-      where: { id_job: jobId },
-      include: [
-        Candidate, 
-        {
-          model: Job,
-          attributes: ['title'] 
-        }
-      ]
-    });
+
+    const jobId = postulation.job.id;
+
+const postulations = await Postulation.findAll({
+  where: { id_job: jobId },
+  include: [
+    { model: Candidate, as: 'candidate' }, 
+    { model: Job, as: 'job', attributes: ['title'] }
+  ]
+});
     
     
     
 
     // Déclaration des variables
     const recruiterEmail = postulation.job.recruiter.email;
-    const candidateName = `${postulation.candidate.firstName} ${postulation.candidate.lastName}`;
+    const jobTitle = postulation.job.title;
+    const candidateName = `${postulation.candidate.name} ${postulation.candidate.firstname}`;
     const candidateCV = postulation.candidate.cvPath;
 
     // Logs pour le diagnostic
@@ -285,9 +287,10 @@ app.put('/api/approve-postulation', authenticate, async (req, res) => {
       from: process.env.EMAIL_USER,
       to: recruiterEmail,
       subject: 'Postulation approuvée',
-      text: `La postulation de ${candidateName} a été approuvée.`,
+      text: `La postulation de ${candidateName} pour le poste de "${jobTitle}" a été approuvée.`,
       attachments: [
         {
+          filename: candidateCV.split('/').pop(),
           path: candidateCV
         }
       ]
