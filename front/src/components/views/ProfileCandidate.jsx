@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,8 +8,14 @@ const ProfileCandidate = () => {
   const [cv, setCv] = useState(null);
   const [id, setId] = useState(localStorage.getItem("id"));
   const [approvedJobs, setApprovedJobs] = useState([]);
+  const formRef = useRef(null);
+  const [isApplied, setIsApplied] = useState({});
 
-
+  const resetForm = () => {
+    setName('');
+    setFirstname('');
+    formRef.current.reset();
+  };
   
   
   console.log("ID depuis le localStorage dans ProfileCandidate: ", localStorage.getItem('id'));
@@ -66,14 +72,17 @@ const ProfileCandidate = () => {
         }
       });
       
-    
       if (response.status === 200) {
+        alert('Votre profil a été mis à jour avec succès.');
+        resetForm();
         console.log("Profil mis à jour avec succès", response.data);
       }
     } catch (error) {
       console.error("Erreur lors de la mise à jour du profil:", error);
+      alert('Erreur lors de la mise à jour du profil. Veuillez réessayer.');
     }
   };
+  
   
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -92,6 +101,8 @@ const ProfileCandidate = () => {
   
   
   const handleApply = async (jobId) => {
+    console.log('Tentative de postulation pour le job:', jobId); 
+  
     try {
       const response = await axios.post('http://localhost:3001/api/postulations', {
         id_candidate: id,
@@ -101,13 +112,23 @@ const ProfileCandidate = () => {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
-      if (response.status === 200) {
-        console.log('Postulation réussie');
+  
+      console.log('Réponse du serveur:', response); 
+  
+      if (response.status >= 200 && response.status < 300) {
+        alert('Vous avez postulé avec succès à l\'emploi.');
+        setIsApplied(prev => ({ ...prev, [jobId]: true }));
+      } else {
+        console.error('Réponse du serveur non attendue:', response);
       }
     } catch (error) {
       console.error('Erreur lors de la postulation:', error);
+      alert('Erreur lors de la postulation. Veuillez réessayer.');
     }
   };
+  
+  
+  
   
 
   const fetchData = async () => {
@@ -138,7 +159,7 @@ const ProfileCandidate = () => {
         </button>
       </div>
       <div className="bg-gray-800 p-8 rounded-lg w-full md:w-1/3 my-8">
-      <form onSubmit={handleFormSubmit}>
+      <form ref={formRef} onSubmit={handleFormSubmit}>
           <input 
             type="text" 
             value={name} 
@@ -177,12 +198,13 @@ const ProfileCandidate = () => {
       <strong>Lieu : </strong> {job.location}
     </div>
     <div>
-      <button
-          className="bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded ml-2"
-          onClick={() => handleApply(job.id)}
-        >
-          Postuler
-        </button>
+    <button
+  className={`bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded ml-2 ${isApplied[job.id] ? 'opacity-50 cursor-not-allowed' : ''}`}
+  onClick={() => handleApply(job.id)}
+  disabled={isApplied[job.id]} >
+  {isApplied[job.id] ? 'Postulation envoyée' : 'Postuler'}
+</button>
+
     </div>
       </li>
     ))}
