@@ -25,12 +25,12 @@ Recruiter.init(
         },
         company: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
         },
 
         address: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
         },
 
         password: {

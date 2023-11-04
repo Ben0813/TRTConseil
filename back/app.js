@@ -184,8 +184,8 @@ app.get('/api/postulations/byJob/:jobId', async (req, res) => {
     const postulations = await Postulation.findAll({
       where: { id_job: jobId },
       include: [
-        { model: Candidate, attributes: ['name'] },
-        { model: Job, attributes: ['title'] }
+        { model: Candidate, as: 'candidate', attributes: ['name'] },
+        { model: Job, as: 'job', attributes: ['title'] }
       ]
     });
     res.json(postulations);
@@ -210,22 +210,23 @@ app.post('/api/postulations', authenticate, async (req, res) => {
 app.get('/api/pending-postulations', authenticate, async (req, res) => {
   try {
     const postulations = await Postulation.findAll({
+      where: { isApproved: false },
       include: [
         {
           model: Candidate,
-          attributes: ['name'],  
-          as: 'candidate' 
+          as: 'candidate',
+          attributes: ['name']
         },
         {
           model: Job,
-          attributes: ['title'],  
-          as: 'job' 
+          as: 'job', 
+          attributes: ['title']
         }
       ]
     });
     res.json(postulations);
   } catch (error) {
-    res.status(500).json({ error: 'Erreur lors de la récupération des postulations.' });
+    res.status(500).json({ error: 'Erreur lors de la récupération des postulations en attente.' });
   }
 });
 

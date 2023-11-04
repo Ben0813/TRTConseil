@@ -12,82 +12,93 @@ const ProfileRecruiter = () => {
     const [jobs, setJobs] = useState([]);
     const [selectedJob, setSelectedJob] = useState('');
     const [recruiterId, setRecruiterId] = useState(localStorage.getItem('id'));
-     const navigate = useNavigate();
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
-useEffect(() => {
-    const isAuthenticated = localStorage.getItem("token") !== null;
-    const hasRecruiterRole = localStorage.getItem("role") === "recruiter";
-    console.log("Is Authenticated:", isAuthenticated);
-    console.log("Has Recruiter Role:", hasRecruiterRole);
-    if (!isAuthenticated || !hasRecruiterRole) {
-        console.log("Redirecting to Home");
-        navigate("/");
+    useEffect(() => {
+        const isAuthenticated = localStorage.getItem("token") !== null;
+        const hasRecruiterRole = localStorage.getItem("role") === "recruiter";
+        if (!isAuthenticated || !hasRecruiterRole) {
+            navigate("/");
         }
-}, [navigate]);
+    }, [navigate]);
 
-const handleLogout = () => {
-    //remove authentication info from localStorage
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-
-    //redirect to logout page
-    navigate("/");
-  };
-
-useEffect(() => {
-    const fetchRecruiterId = async () => {
-      try {
-        const response = await axios.get('http://localhost:3001/api/recruiters');
-        setRecruiterId(response.data[0].id);
-      } catch (error) {
-        console.error('Erreur lors de la récupération de l\'ID du recruteur:', error);
-      }
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        navigate("/");
     };
 
-    const fetchJobs = async () => {
-        try {
-          const response = await axios.get('http://localhost:3001/api/jobs');
-          setJobs(response.data);
-        } catch (error) {
-          console.error('Erreur lors de la récupération des jobs:', error);
-        }
-      };
-  
-      fetchRecruiterId();
-      fetchJobs();
+    useEffect(() => {
+        const fetchRecruiterId = async () => {
+            try {
+                const response = await axios.get('http://localhost:3001/api/recruiters');
+                setRecruiterId(response.data[0].id);
+            } catch (error) {
+                console.error('Erreur lors de la récupération de l\'ID du recruteur:', error);
+            }
+        };
+
+        fetchRecruiterId();
     }, []);
 
-    const fetchCandidates = async () => {
-        try {
-          const response = await axios.get('http://localhost:3001/api/candidates');
-          setCandidates(response.data);
-          console.log('Candidats récupérés:', response.data);
-        } catch (error) {
-          console.error('Erreur lors de la récupération des candidats:', error);
-        }
-      };
-    
-      useEffect(() => {
-        fetchCandidates();
-      }, []);
-
-      useEffect(() => {
-        const fetchJobsByRecruiter = async () => {
-          const response = await axios.get(`http://localhost:3001/api/jobs/byRecruiter/${recruiterId}`);
-          // Fetch postulations for each job
-          const jobsWithPostulations = await Promise.all(
-            response.data.map(async job => {
-              const postulationsResponse = await axios.get(`http://localhost:3001/api/postulations/byJob/${job.id}`);
-              return {
-                ...job,
-                postulations: postulationsResponse.data
-              };
-            })
-          );
-          setJobs(jobsWithPostulations);
+    useEffect(() => {
+        const fetchJobs = async () => {
+            try {
+                const response = await axios.get('http://localhost:3001/api/jobs');
+                setJobs(response.data);
+            } catch (error) {
+                console.error('Erreur lors de la récupération des jobs:', error);
+            }
         };
+
+        fetchJobs();
+    }, [recruiterId]);
+
+    useEffect(() => {
+        const fetchCandidates = async () => {
+            try {
+                const response = await axios.get('http://localhost:3001/api/candidates');
+                setCandidates(response.data);
+            } catch (error) {
+                console.error('Erreur lors de la récupération des candidats:', error);
+            }
+        };
+
+        fetchCandidates();
+    }, []);
+
+    useEffect(() => {
+        if (!recruiterId) return;
+
+        const fetchJobsByRecruiter = async () => {
+            try {
+                const response = await axios.get(`http://localhost:3001/api/jobs/byRecruiter/${recruiterId}`);
+                const jobsWithPostulations = await Promise.all(
+                    response.data.map(async job => {
+                        try {
+                            const postulationsResponse = await axios.get(`http://localhost:3001/api/postulations/byJob/${job.id}`);
+                            return {
+                                ...job,
+                                postulations: postulationsResponse.data || []
+                            };
+                        } catch (error) {
+                            console.error(`Erreur lors de la récupération des postulations pour le job ${job.id}:`, error);
+                            setError(`Erreur lors de la récupération des postulations pour le job ${job.id}.`);
+                            return { ...job, postulations: [] };
+                        }
+                    })
+                );
+                setJobs(jobsWithPostulations);
+            } catch (error) {
+                console.error('Erreur lors de la récupération des jobs par recruteur:', error);
+                setError('Erreur lors de la récupération des jobs.');
+            }
+        };
+
         fetchJobsByRecruiter();
-      }, [recruiterId]);
+    }, [recruiterId]);
+
 
   const updateRecruiterProfile = async () => {
     try {
@@ -194,21 +205,21 @@ useEffect(() => {
       <div className="bg-gray-800 p-5 rounded shadow-lg w-full md:w-1/2 mx-auto mt-10">
     <h1 className="text-white text-2xl mb-5">Candidats ayant postulé</h1>
     <ul>
-        {jobs && jobs.length > 0 ? jobs.map((job, index) => (
-            <li key={index}>
-                {job.title}
-                <ul>
-                    {job.postulations && job.postulations.length > 0 ? job.postulations.map((postulation, pIndex) => (
-                        <li key={pIndex}>
-                            {postulation.Candidate && postulation.Candidate.name ? postulation.Candidate.name : 'Inconnu'} a postulé pour le poste {job.title}
-                        </li>
-                    )) : "Aucune postulation pour ce job"}
-                </ul>
-            </li>
-        )) : "Aucun job trouvé"}
+                        {jobs.map((job) =>
+                        Array.isArray(job.postulations) ? (
+                            job.postulations.map((postulation) => (
+                                <li key={postulation.id} className="mb-4">
+                                    Candidat : {postulation.candidate.name}, a postulé pour le Job : {job.title}
+                                </li>
+                            ))
+                        ) : (
+                            <li key={job.id} className="mb-4">
+                                {job.title}
+                            </li>
+                        )
+                    )}
     </ul>
 </div>
-
     </div>
   );
 };

@@ -197,23 +197,22 @@ const ProfileConsultant = () => {
   <div className="bg-gray-800 p-8 rounded-lg w-full md:w-1/3 my-8">
     <h1 className="text-2xl mb-5">Postulations en attente de validation</h1>
     <ul className="list-inside list-disc">
-    {pendingPostulations.map((postulation) => {
+  {pendingPostulations.map((postulation) => {
     const buttonColor = postulation.isApproved ? "bg-green-500" : "bg-red-500";
-    const buttonText = postulation.isApproved ? "Approuvé" : "Non approuvé";
+    const buttonText = postulation.isApproved ? "Désapprouver" : "Approuver";
     return (
-        <li key={postulation.id} className="mb-4">
-            Candidat : {postulation.candidate.name}, Job : {postulation.job.title}  
-            <button 
-                className={`${buttonColor} hover:bg-green-700 text-white py-1 px-2 rounded ml-2`}
-                onClick={() => togglePostulationApproval(postulation.id, postulation.isApproved)}
-            >
-                {buttonText}
-            </button>
-        </li>
+      <li key={postulation.id} className="mb-4">
+        Candidat : {postulation.candidate.name}, Job : {postulation.job.title}
+        <button 
+          className={`${buttonColor} hover:bg-green-700 text-white py-1 px-2 rounded ml-2`}
+          onClick={() => togglePostulationApproval(postulation.id, postulation.isApproved)}
+        >
+          {buttonText}
+        </button>
+      </li>
     );
-})}
-
-    </ul>
+  })}
+</ul>
 </div>
 
     </div>
