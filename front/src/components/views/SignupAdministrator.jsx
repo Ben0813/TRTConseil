@@ -7,6 +7,13 @@ const SignupAdministrator = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const resetForm = () => {
+    setName('');
+    setFirstname('');
+    setEmail('');
+    setPassword('');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const url = 'http://localhost:3001/api/administrators';
@@ -17,9 +24,11 @@ const SignupAdministrator = () => {
         email,
         password
       });
-      console.log('Compte administrateur créé avec succès:', response.data);
+      alert('Compte créé avec succès. Bienvenue Chef !');
+      resetForm();
     } catch (error) {
-      console.error('Erreur lors de la création du compte administrateur:', error);
+      console.error('Erreur lors de la création du compte:', error);
+      alert('Erreur lors de la création du compte. Veuillez réessayer.');
     }
   };
 

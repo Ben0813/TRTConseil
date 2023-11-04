@@ -7,6 +7,13 @@ const SignupRecruiter = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const resetForm = () => {
+    setName('');
+    setFirstname('');
+    setEmail('');
+    setPassword('');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -16,9 +23,11 @@ const SignupRecruiter = () => {
         email,
         password
       });
-      console.log('Compte créé avec succès:', response.data);
+      alert('Compte créé avec succès. Bienvenue ! Un Consultant va vérifier vos données avant de vous donner accès à la plateforme.');
+      resetForm();
     } catch (error) {
       console.error('Erreur lors de la création du compte:', error);
+      alert('Erreur lors de la création du compte. Veuillez réessayer.');
     }
   };
 

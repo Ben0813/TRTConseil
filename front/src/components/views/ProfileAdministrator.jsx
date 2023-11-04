@@ -11,6 +11,13 @@ const ProfileAdministrator = () => {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
+  const resetForm = () => {
+    setName('');
+    setFirstname('');
+    setEmail('');
+    setPassword('');
+  };
+
   useEffect(() => {
     const isAuthenticated = localStorage.getItem("token") !== null;
     const hasAdminRole = localStorage.getItem("role") === "administrator";
@@ -38,9 +45,11 @@ const ProfileAdministrator = () => {
         email,
         password
       });
-      console.log('Compte consultant créé avec succès:', response.data);
+      alert('Compte créé avec succès. trop fort chef !');
+      resetForm();
     } catch (error) {
-      console.error('Erreur lors de la création du compte consultant:', error);
+      console.error('Erreur lors de la création du compte:', error);
+      alert('Erreur lors de la création du compte. Veuillez réessayer.');
     }
   };
 
