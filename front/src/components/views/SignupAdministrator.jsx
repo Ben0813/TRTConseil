@@ -1,12 +1,17 @@
 import React, { useState } from "react";
 import axios from "axios";
 
+/**
+ * SignupAdministrator component is responsible for rendering the sign-up form for administrators
+ */
 const SignupAdministrator = () => {
+  // State hooks to store form inputs
   const [name, setName] = useState("");
   const [firstname, setFirstname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  // Function to reset form fields to default empty values
   const resetForm = () => {
     setName("");
     setFirstname("");
@@ -14,6 +19,7 @@ const SignupAdministrator = () => {
     setPassword("");
   };
 
+  // Function to handle the creation of a new administrator account
   const handleSubmit = async (e) => {
     e.preventDefault();
     const url = "http://localhost:3001/api/administrators";

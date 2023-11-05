@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 
+/**
+ * `SignupCandidate` is a component that renders a signup form for candidates
+ */
 const SignupCandidate = () => {
   const [name, setName] = useState("");
   const [firstname, setFirstname] = useState("");
@@ -8,6 +11,7 @@ const SignupCandidate = () => {
   const [password, setPassword] = useState("");
   const [cv, setCv] = useState("");
 
+  // Function to reset form fields to default empty values
   const resetForm = () => {
     setName("");
     setFirstname("");
@@ -15,6 +19,7 @@ const SignupCandidate = () => {
     setPassword("");
   };
 
+  // Function to handle the creation of a new candidate account
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {

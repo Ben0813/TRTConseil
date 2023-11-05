@@ -2,7 +2,12 @@ import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * ProfileCandidate is a component that allows candidates to manage their profiles,
+ * upload CVs, and apply for approved jobs
+ */
 const ProfileCandidate = () => {
+  // State variables to store form data
   const [name, setName] = useState("");
   const [firstname, setFirstname] = useState("");
   const [cv, setCv] = useState(null);
@@ -11,27 +16,27 @@ const ProfileCandidate = () => {
   const formRef = useRef(null);
   const [isApplied, setIsApplied] = useState({});
 
+  // Function to reset form fields to default empty values
   const resetForm = () => {
     setName("");
     setFirstname("");
     formRef.current.reset();
   };
 
-  console.log(
-    "ID depuis le localStorage dans ProfileCandidate: ",
-    localStorage.getItem("id")
-  );
-
+  // Navigate hook to redirect the user
   const navigate = useNavigate();
 
+  // Effect hook to verify authentication and role before component mounts
   useEffect(() => {
     const isAuthenticated = localStorage.getItem("token") !== null;
     const hasCandidateRole = localStorage.getItem("role") === "candidate";
+    // If not authenticated or not a candidate, redirect to home page
     if (!isAuthenticated || !hasCandidateRole) {
       navigate("/");
     }
   }, [navigate]);
 
+  // Effect hook to fetch approved jobs from the server
   useEffect(() => {
     const fetchApprovedJobs = async () => {
       try {
@@ -52,6 +57,7 @@ const ProfileCandidate = () => {
     fetchApprovedJobs();
   }, []);
 
+  // Function to handle user logout
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
@@ -59,6 +65,7 @@ const ProfileCandidate = () => {
     navigate("/");
   };
 
+  // Function to handle file selection for CV upload
   const handleCvUpload = (e) => {
     const file = e.target.files[0];
     if (file && file.type === "application/pdf") {
@@ -68,6 +75,7 @@ const ProfileCandidate = () => {
     }
   };
 
+  // Function to update the candidate's profile
   const updateProfile = async (id, dataToUpdate) => {
     try {
       const response = await axios.put(
@@ -91,6 +99,7 @@ const ProfileCandidate = () => {
     }
   };
 
+  // Function to handle form submission for profile updates
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
@@ -106,6 +115,7 @@ const ProfileCandidate = () => {
     updateProfile(id, formData);
   };
 
+  // Function to handle job application
   const handleApply = async (jobId) => {
     console.log("Tentative de postulation pour le job:", jobId);
 
@@ -136,23 +146,6 @@ const ProfileCandidate = () => {
       alert("Erreur lors de la postulation. Veuillez réessayer.");
     }
   };
-
-  const fetchData = async () => {
-    try {
-      const response = await axios.get("http://localhost:3001/api/candidates", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      console.log(response.data);
-    } catch (error) {
-      console.error("Erreur lors de la récupération des données:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   return (
     <div className="flex flex-col items-center bg-gray-900 min-h-screen text-white">

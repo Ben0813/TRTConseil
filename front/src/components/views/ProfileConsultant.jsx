@@ -2,21 +2,28 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * ProfileConsultant component is used to manage pending accounts, jobs, and approval
+ */
 const ProfileConsultant = () => {
+  // State variable to store pending accounts, jobs, and postulations
   const [pendingAccounts, setPendingAccounts] = useState([]);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const [pendingJobs, setPendingJobs] = useState([]);
   const [pendingPostulations, setPendingPostulations] = useState([]);
 
+  // Effect hook to verify authentication and role before component mounts
   useEffect(() => {
     const isAuthenticated = localStorage.getItem("token") !== null;
     const hasConsultantRole = localStorage.getItem("role") === "consultant";
+    // If not authenticated or not a consultant, redirect to home page
     if (!isAuthenticated || !hasConsultantRole) {
       navigate("/");
     }
   }, [navigate]);
 
+  // Effect hook to fetch pending accounts from the server
   useEffect(() => {
     const fetchPendingAccounts = async () => {
       try {
@@ -40,6 +47,7 @@ const ProfileConsultant = () => {
     fetchPendingAccounts();
   }, [token]);
 
+  // Effect hook to fetch pending jobs from the server
   useEffect(() => {
     const fetchPendingJobs = async () => {
       try {
@@ -60,6 +68,7 @@ const ProfileConsultant = () => {
     fetchPendingJobs();
   }, [token]);
 
+  // Effect hook to fetch pending postulations from the server
   useEffect(() => {
     const fetchPendingPostulations = async () => {
       try {
@@ -83,12 +92,14 @@ const ProfileConsultant = () => {
     fetchPendingPostulations();
   }, [token]);
 
+  // Function to handle user logout
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
     navigate("/");
   };
 
+  // Function to toggle account approval
   const toggleApproval = async (id, type, isApproved) => {
     try {
       const response = await axios.put(
@@ -119,6 +130,7 @@ const ProfileConsultant = () => {
     }
   };
 
+  // Function to toggle job approval
   const toggleJobApproval = async (id, isApproved) => {
     try {
       const response = await axios.put(
@@ -146,6 +158,7 @@ const ProfileConsultant = () => {
     }
   };
 
+  // Function to toggle postulation approval
   const togglePostulationApproval = async (id, isApproved) => {
     try {
       const response = await axios.put(

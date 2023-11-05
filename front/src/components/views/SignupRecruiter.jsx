@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import axios from "axios";
 
+/** SignupRecruiter is a component that renders a signup form for recruiters */
 const SignupRecruiter = () => {
   const [name, setName] = useState("");
   const [firstname, setFirstname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  // Function to reset form fields to default empty values
   const resetForm = () => {
     setName("");
     setFirstname("");
@@ -14,6 +16,7 @@ const SignupRecruiter = () => {
     setPassword("");
   };
 
+  // Function to handle the creation of a new recruiter account
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {

@@ -2,15 +2,23 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+// Retrieve the token from local storage to check authentication status
 const token = localStorage.getItem("token");
 
+/**
+ * ProfileAdministrator component represents the administrator's profile page
+ * Allows an administrator to create consultant accounts
+ */
 const ProfileAdministrator = () => {
+  // State variables to store form data
   const [name, setName] = useState("");
   const [firstname, setFirstname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // Navigate hook to redirect the user
   const navigate = useNavigate();
 
+  // Function to reset form fields to default empty values
   const resetForm = () => {
     setName("");
     setFirstname("");
@@ -18,14 +26,17 @@ const ProfileAdministrator = () => {
     setPassword("");
   };
 
+  // Effect hook to check if the user is authenticated and has the administrator role
   useEffect(() => {
     const isAuthenticated = localStorage.getItem("token") !== null;
     const hasAdminRole = localStorage.getItem("role") === "administrator";
+    // If not authenticated or not an administrator, redirect to home page
     if (!isAuthenticated || !hasAdminRole) {
       navigate("/");
     }
   }, [navigate]);
 
+  // Function to handle user logout
   const handleLogout = () => {
     //remove authentication info from localStorage
     localStorage.removeItem("token");
@@ -35,6 +46,7 @@ const ProfileAdministrator = () => {
     navigate("/");
   };
 
+  // Function to handle the creation of a new consultant account
   const handleCreateConsultant = async (e) => {
     e.preventDefault();
     const url = "http://localhost:3001/api/consultants";

@@ -2,7 +2,12 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * ProfileRecruiter component manages recruiter profiles, job postings,
+ * and displays candidates who have applied for jobs.
+ */
 const ProfileRecruiter = () => {
+  // State hooks for various recruiter and job details
   const [companyName, setCompanyName] = useState("");
   const [address, setAddress] = useState("");
   const [jobTitle, setJobTitle] = useState("");
@@ -14,23 +19,28 @@ const ProfileRecruiter = () => {
   const [recruiterId, setRecruiterId] = useState(localStorage.getItem("id"));
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  // State hooks to handle update and post status messages
   const [updateStatus, setUpdateStatus] = useState("");
   const [postStatus, setPostStatus] = useState("");
 
+  // Effect hook to verify authentication and role before component mounts
   useEffect(() => {
     const isAuthenticated = localStorage.getItem("token") !== null;
     const hasRecruiterRole = localStorage.getItem("role") === "recruiter";
+    // If not authenticated or not a recruiter, redirect to home page
     if (!isAuthenticated || !hasRecruiterRole) {
       navigate("/");
     }
   }, [navigate]);
 
+  // Function to handle user logout
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
     navigate("/");
   };
 
+  // Fetches the ID of the recruiter from the API
   useEffect(() => {
     const fetchRecruiterId = async () => {
       try {
@@ -49,6 +59,7 @@ const ProfileRecruiter = () => {
     fetchRecruiterId();
   }, []);
 
+  // Fetches the list of jobs from the API
   useEffect(() => {
     const fetchJobs = async () => {
       try {
@@ -62,6 +73,7 @@ const ProfileRecruiter = () => {
     fetchJobs();
   }, [recruiterId]);
 
+  // Fetches the list of candidates from the API
   useEffect(() => {
     const fetchCandidates = async () => {
       try {
@@ -80,6 +92,7 @@ const ProfileRecruiter = () => {
   useEffect(() => {
     if (!recruiterId) return;
 
+    // Fetches jobs by the recruiter and their associated postulations
     const fetchJobsByRecruiter = async () => {
       try {
         const response = await axios.get(
@@ -120,6 +133,7 @@ const ProfileRecruiter = () => {
     fetchJobsByRecruiter();
   }, [recruiterId]);
 
+  // Function to update the recruiter's profile
   const updateRecruiterProfile = async () => {
     try {
       const payload = {
@@ -153,11 +167,13 @@ const ProfileRecruiter = () => {
     }
   };
 
+  // Function to handle form submission for profile updates
   const handleUpdateProfile = (e) => {
     e.preventDefault();
     updateRecruiterProfile();
   };
 
+  // Function to handle job posting
   const handleJobPost = async (e) => {
     e.preventDefault();
     const payload = {

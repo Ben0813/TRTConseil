@@ -2,24 +2,31 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+/**
+ * Login component that allows the user to log in to the application
+ * Uses a form to collect the user's credentials (email and password)
+ */
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [userType, setUserType] = useState("candidate");
 
+  /** Function that handles the login of the user
+   * It sends a POST request to the API with the user's credentials
+   * If the login is successful, the user is redirected to the profile page
+   **/
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("trying to log with", email, password, userType);
     try {
+      // API endpoint for login, based on the user type
       const endPoint = `http://localhost:3001/api/${userType}s/login`;
       const response = await axios.post(endPoint, {
         email,
         password,
       });
 
-      console.log("Réponse de l'API: ", response.data);
-
+      // Destructuring the response to extract the token and user ID
       const { token, id } = response.data;
       localStorage.setItem("token", token);
       localStorage.setItem("role", userType);
