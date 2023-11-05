@@ -1,33 +1,38 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
+import axios from "axios";
 
 const SignupRecruiter = () => {
-  const [name, setName] = useState('');
-  const [firstname, setFirstname] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [name, setName] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const resetForm = () => {
-    setName('');
-    setFirstname('');
-    setEmail('');
-    setPassword('');
+    setName("");
+    setFirstname("");
+    setEmail("");
+    setPassword("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3001/api/recruiters', {
-        name,
-        firstname,
-        email,
-        password
-      });
-      alert('Compte créé avec succès. Bienvenue ! Un Consultant va vérifier vos données avant de vous donner accès à la plateforme.');
+      const response = await axios.post(
+        "http://localhost:3001/api/recruiters",
+        {
+          name,
+          firstname,
+          email,
+          password,
+        }
+      );
+      alert(
+        "Compte créé avec succès. Bienvenue ! Un Consultant va vérifier vos données avant de vous donner accès à la plateforme."
+      );
       resetForm();
     } catch (error) {
-      console.error('Erreur lors de la création du compte:', error);
-      alert('Erreur lors de la création du compte. Veuillez réessayer.');
+      console.error("Erreur lors de la création du compte:", error);
+      alert("Erreur lors de la création du compte. Veuillez réessayer.");
     }
   };
 
@@ -63,11 +68,13 @@ const SignupRecruiter = () => {
             onChange={(e) => setPassword(e.target.value)}
             className="p-2 rounded bg-gray-700 w-full mb-4"
           />
-          <button type="submit" className="bg-green-500 p-2 rounded w-full">S'inscrire</button>
+          <button type="submit" className="bg-green-500 p-2 rounded w-full">
+            S'inscrire
+          </button>
         </form>
       </div>
     </div>
   );
-}
+};
 
 export default SignupRecruiter;

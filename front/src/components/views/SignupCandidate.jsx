@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
+import axios from "axios";
 
 const SignupCandidate = () => {
-  const [name, setName] = useState('');
-  const [firstname, setFirstname] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [cv, setCv] = useState('');
+  const [name, setName] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [cv, setCv] = useState("");
 
   const resetForm = () => {
-    setName('');
-    setFirstname('');
-    setEmail('');
-    setPassword('');
+    setName("");
+    setFirstname("");
+    setEmail("");
+    setPassword("");
   };
 
   const handleSubmit = async (e) => {
@@ -24,27 +24,30 @@ const SignupCandidate = () => {
         email,
         password,
       };
-  
-      if (cv !== '') {
+
+      if (cv !== "") {
         data.cv = cv;
       }
-  
-      const response = await axios.post('http://localhost:3001/api/candidates', data);
-  
+
+      const response = await axios.post(
+        "http://localhost:3001/api/candidates",
+        data
+      );
+
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
-        localStorage.setItem("userType", "candidate"); 
+        localStorage.setItem("userType", "candidate");
       }
-  
-      alert('Compte créé avec succès. Bienvenue ! Un Consultant va vérifier vos données avant de vous donner accès à la plateforme.');
+
+      alert(
+        "Compte créé avec succès. Bienvenue ! Un Consultant va vérifier vos données avant de vous donner accès à la plateforme."
+      );
       resetForm();
-      
     } catch (error) {
-      console.error('Erreur lors de la création du compte:', error);
-      alert('Erreur lors de la création du compte. Veuillez réessayer.');
+      console.error("Erreur lors de la création du compte:", error);
+      alert("Erreur lors de la création du compte. Veuillez réessayer.");
     }
   };
-
 
   return (
     <div className="flex flex-col items-center bg-gray-900 min-h-screen text-white">
@@ -78,11 +81,13 @@ const SignupCandidate = () => {
             onChange={(e) => setPassword(e.target.value)}
             className="p-2 rounded bg-gray-700 w-full mb-4"
           />
-          <button type="submit" className="bg-green-500 p-2 rounded w-full">S'inscrire</button>
+          <button type="submit" className="bg-green-500 p-2 rounded w-full">
+            S'inscrire
+          </button>
         </form>
       </div>
     </div>
   );
-}
+};
 
 export default SignupCandidate;

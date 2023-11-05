@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const token = localStorage.getItem('token');
+const token = localStorage.getItem("token");
 
 const ProfileAdministrator = () => {
-  const [name, setName] = useState('');
-  const [firstname, setFirstname] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [name, setName] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
   const resetForm = () => {
-    setName('');
-    setFirstname('');
-    setEmail('');
-    setPassword('');
+    setName("");
+    setFirstname("");
+    setEmail("");
+    setPassword("");
   };
 
   useEffect(() => {
@@ -26,30 +26,30 @@ const ProfileAdministrator = () => {
     }
   }, [navigate]);
 
-    const handleLogout = () => {
+  const handleLogout = () => {
     //remove authentication info from localStorage
     localStorage.removeItem("token");
     localStorage.removeItem("role");
 
     //redirect to logout page
     navigate("/");
-    };
+  };
 
   const handleCreateConsultant = async (e) => {
     e.preventDefault();
-    const url = 'http://localhost:3001/api/consultants';
+    const url = "http://localhost:3001/api/consultants";
     try {
       const response = await axios.post(url, {
         name,
         firstname,
         email,
-        password
+        password,
       });
-      alert('Compte créé avec succès. trop fort chef !');
+      alert("Compte créé avec succès. trop fort chef !");
       resetForm();
     } catch (error) {
-      console.error('Erreur lors de la création du compte:', error);
-      alert('Erreur lors de la création du compte. Veuillez réessayer.');
+      console.error("Erreur lors de la création du compte:", error);
+      alert("Erreur lors de la création du compte. Veuillez réessayer.");
     }
   };
 
@@ -66,7 +66,7 @@ const ProfileAdministrator = () => {
       <div className="bg-gray-800 p-8 rounded-lg w-full md:w-1/3 my-8">
         <h1 className="text-2xl mb-5">Créer un compte consultant</h1>
         <form onSubmit={handleCreateConsultant}>
-        <input
+          <input
             type="text"
             placeholder="Nom"
             value={name}
@@ -94,11 +94,13 @@ const ProfileAdministrator = () => {
             onChange={(e) => setPassword(e.target.value)}
             className="p-2 rounded bg-gray-700 w-full mb-4"
           />
-          <button type="submit" className="bg-green-500 p-2 rounded w-full">Créer</button>
+          <button type="submit" className="bg-green-500 p-2 rounded w-full">
+            Créer
+          </button>
         </form>
       </div>
     </div>
   );
-}
+};
 
 export default ProfileAdministrator;

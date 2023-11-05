@@ -1,34 +1,34 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
+import axios from "axios";
 
 const SignupAdministrator = () => {
-  const [name, setName] = useState('');
-  const [firstname, setFirstname] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [name, setName] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const resetForm = () => {
-    setName('');
-    setFirstname('');
-    setEmail('');
-    setPassword('');
+    setName("");
+    setFirstname("");
+    setEmail("");
+    setPassword("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const url = 'http://localhost:3001/api/administrators';
+    const url = "http://localhost:3001/api/administrators";
     try {
       const response = await axios.post(url, {
         name,
         firstname,
         email,
-        password
+        password,
       });
-      alert('Compte créé avec succès. Bienvenue Chef !');
+      alert("Compte créé avec succès. Bienvenue Chef !");
       resetForm();
     } catch (error) {
-      console.error('Erreur lors de la création du compte:', error);
-      alert('Erreur lors de la création du compte. Veuillez réessayer.');
+      console.error("Erreur lors de la création du compte:", error);
+      alert("Erreur lors de la création du compte. Veuillez réessayer.");
     }
   };
 
@@ -36,7 +36,7 @@ const SignupAdministrator = () => {
     <div className="flex flex-col items-center bg-gray-900 min-h-screen text-white">
       <div className="bg-gray-800 p-8 rounded-lg w-full md:w-1/3 my-8">
         <form onSubmit={handleSubmit}>
-        <input
+          <input
             type="text"
             placeholder="Nom"
             value={name}
@@ -64,11 +64,13 @@ const SignupAdministrator = () => {
             onChange={(e) => setPassword(e.target.value)}
             className="p-2 rounded bg-gray-700 w-full mb-4"
           />
-          <button type="submit" className="bg-green-500 p-2 rounded w-full">S'inscrire</button>
+          <button type="submit" className="bg-green-500 p-2 rounded w-full">
+            S'inscrire
+          </button>
         </form>
       </div>
     </div>
   );
-}
+};
 
 export default SignupAdministrator;

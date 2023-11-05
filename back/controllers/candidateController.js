@@ -3,15 +3,14 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import multer from "multer";
 
-
 // Configuration de Multer pour le stockage des fichiers
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, './uploads/');
+    cb(null, "./uploads/");
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + file.originalname);
-  }
+  },
 });
 
 export const upload = multer({ storage: storage });
@@ -35,29 +34,28 @@ export const getCandidateById = async (req, res) => {
 };
 
 export const createCandidate = async (req, res) => {
-  console.log('Entrée dans createCandidate'); 
-  console.log('Données reçues:', req.body); 
-  
+  console.log("Entrée dans createCandidate");
+  console.log("Données reçues:", req.body);
+
   const { name, firstname, email, password } = req.body;
-  if (!name || !firstname || !email || !password ) {
-    return res.status(400).json({ message: 'Tous les champs sont requis.' });
+  if (!name || !firstname || !email || !password) {
+    return res.status(400).json({ message: "Tous les champs sont requis." });
   }
 
   try {
     const candidate = await Candidate.create({
       ...req.body,
-      isApproved: false 
+      isApproved: false,
     });
     res.status(201).json({ id: candidate.id });
   } catch (err) {
-    console.log('Erreur:', err); 
-    if (err.name === 'SequelizeUniqueConstraintError') {
-      return res.status(400).json({ message: 'Email déjà utilisé.' });
+    console.log("Erreur:", err);
+    if (err.name === "SequelizeUniqueConstraintError") {
+      return res.status(400).json({ message: "Email déjà utilisé." });
     }
-    res.status(500).json({ message: 'Une erreur interne s\'est produite.' });
+    res.status(500).json({ message: "Une erreur interne s'est produite." });
   }
 };
-
 
 // Méthode updateCandidate
 export const updateCandidate = async (req, res) => {
@@ -77,23 +75,23 @@ export const updateCandidate = async (req, res) => {
     if (cv) candidate.cvPath = cv.path;
 
     await candidate.save();
-    res.status(200).json({ message: "Profil mis à jour avec succès", candidate });
+    res
+      .status(200)
+      .json({ message: "Profil mis à jour avec succès", candidate });
   } catch (error) {
     res.status(500).json({ error: "Erreur lors de la mise à jour du profil" });
   }
 };
 
-
-
 export const uploadCV = async (req, res) => {
-  const { id } = req.user; 
+  const { id } = req.user;
   const cvPath = req.file.path;
 
   try {
     await Candidate.update({ cvPath }, { where: { id } });
-    res.status(200).json({ message: 'CV uploadé avec succès.' });
+    res.status(200).json({ message: "CV uploadé avec succès." });
   } catch (error) {
-    res.status(500).json({ error: 'Erreur lors de l’upload du CV.' });
+    res.status(500).json({ error: "Erreur lors de l’upload du CV." });
   }
 };
 
@@ -121,7 +119,9 @@ export const loginCandidate = async (req, res) => {
     }
 
     if (!candidate.isApproved) {
-      return res.status(401).json({ message: "Your account has not been approved yet" });
+      return res
+        .status(401)
+        .json({ message: "Your account has not been approved yet" });
     }
 
     const passwordValid = await bcrypt.compare(password, candidate.password);
@@ -144,7 +144,6 @@ export const loginCandidate = async (req, res) => {
   }
 };
 
-
 const candidateController = {
   getCandidates,
   getCandidateById,
@@ -152,9 +151,7 @@ const candidateController = {
   updateCandidate,
   deleteCandidate,
   loginCandidate,
-  uploadCV
+  uploadCV,
 };
-
-
 
 export default candidateController;
