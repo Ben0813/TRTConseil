@@ -1,4 +1,3 @@
-import e from "express";
 import Candidate from "./Candidate.js";
 import Job from "./Job.js";
 import Postulation from "./Postulation.js";

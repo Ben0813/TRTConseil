@@ -2,6 +2,7 @@ import Administrator from "../models/Administrator.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+// Retrieves all administrators from the database
 export const getAdministrators = async (req, res) => {
   try {
     const administrators = await Administrator.findAll();
@@ -11,6 +12,7 @@ export const getAdministrators = async (req, res) => {
   }
 };
 
+// Retrieves an administrator with the specified ID from the database
 export const getAdministratorById = async (req, res) => {
   try {
     const administrator = await Administrator.findByPk(req.params.id);
@@ -20,6 +22,7 @@ export const getAdministratorById = async (req, res) => {
   }
 };
 
+// Creates a new administrator in the database
 export const createAdministrator = async (req, res) => {
   try {
     const administrator = await Administrator.create(req.body);
@@ -29,6 +32,7 @@ export const createAdministrator = async (req, res) => {
   }
 };
 
+// Updates an existing administrator in the database
 export const updateAdministrator = async (req, res) => {
   try {
     const administrator = await Administrator.findByPk(req.params.id);
@@ -43,6 +47,7 @@ export const updateAdministrator = async (req, res) => {
   }
 };
 
+// Deletes an administrator from the database
 export const deleteAdministrator = async (req, res) => {
   try {
     const administrator = await Administrator.findByPk(req.params.id);
@@ -57,6 +62,7 @@ export const deleteAdministrator = async (req, res) => {
   }
 };
 
+// Logs in an administrator
 export const loginAdministrator = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -88,6 +94,7 @@ export const loginAdministrator = async (req, res) => {
   }
 };
 
+// The administrator controller object
 const administratorController = {
   getAdministrators,
   getAdministratorById,

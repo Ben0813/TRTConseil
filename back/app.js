@@ -2,25 +2,22 @@ import express from "express";
 import cors from "cors";
 import bcrypt from "bcrypt";
 import session from "express-session";
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { Op } from "sequelize";
 import authenticate from "./middleware/authenticate.js";
 import nodemailer from "nodemailer";
 
 dotenv.config();
 
-// Import des modèles
+// Import models
 import Recruiter from "./models/Recruiter.js";
 import Candidate from "./models/Candidate.js";
 import Consultant from "./models/Consultant.js";
 import Administrator from "./models/Administrator.js";
 import Job from "./models/Job.js";
 import Postulation from "./models/Postulation.js";
-
 import "./models/initModels.js";
 
-// Ajout des hooks pour le hachage des mots de passe
+// Hooks for password hashing
 const addHashingHooks = (model) => {
   model.addHook("beforeCreate", async (user) => {
     if (user.password) {
@@ -42,6 +39,7 @@ addHashingHooks(Recruiter);
 addHashingHooks(Consultant);
 addHashingHooks(Administrator);
 
+// Nodemailer transporter object for sending emails
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -50,7 +48,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Import des routes
+// Import routes
 import recruiterRoutes from "./routes/recruiters.js";
 import candidateRoutes from "./routes/candidates.js";
 import consultantRoutes from "./routes/consultants.js";
@@ -58,12 +56,10 @@ import administratorRoutes from "./routes/administrators.js";
 import jobRoutes from "./routes/jobs.js";
 import postulationRoutes from "./routes/postulations.js";
 
+// Create express application
 const app = express();
 
-// Configuration des middlewares
-app.use(cors());
-app.use(express.json());
-
+// Using express session
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -72,7 +68,11 @@ app.use(
   })
 );
 
-// Utilisation des routes
+// Using middleware
+app.use(cors());
+app.use(express.json());
+
+// Using routes CRUD
 app.use("/api/recruiters", recruiterRoutes);
 app.use("/api/candidates", candidateRoutes);
 app.use("/api/consultants", consultantRoutes);
@@ -80,6 +80,7 @@ app.use("/api/administrators", administratorRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/postulations", postulationRoutes);
 
+// Using specific routes
 app.get("/api/pending-accounts", authenticate, async (req, res) => {
   try {
     const candidates = await Candidate.findAll();
@@ -102,11 +103,9 @@ app.get("/api/pending-accounts", authenticate, async (req, res) => {
 
     res.json(pendingAccounts);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: "Erreur lors de la récupération des comptes en attente.",
-      });
+    res.status(500).json({
+      error: "Erreur lors de la récupération des comptes en attente.",
+    });
   }
 });
 
@@ -238,11 +237,9 @@ app.get("/api/pending-postulations", authenticate, async (req, res) => {
     });
     res.json(postulations);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: "Erreur lors de la récupération des postulations en attente.",
-      });
+    res.status(500).json({
+      error: "Erreur lors de la récupération des postulations en attente.",
+    });
   }
 });
 
@@ -251,7 +248,7 @@ app.put("/api/approve-postulation", authenticate, async (req, res) => {
   try {
     await Postulation.update({ isApproved }, { where: { id } });
 
-    // Récupérer des informations supplémentaires pour l'e-mail
+    // Retrieving additional information for the email
     const postulation = await Postulation.findByPk(id, {
       include: [
         {
@@ -282,18 +279,12 @@ app.put("/api/approve-postulation", authenticate, async (req, res) => {
       ],
     });
 
-    // Déclaration des variables
     const recruiterEmail = postulation.job.recruiter.email;
     const jobTitle = postulation.job.title;
     const candidateName = `${postulation.candidate.name} ${postulation.candidate.firstname}`;
     const candidateCV = postulation.candidate.cvPath;
 
-    // Logs pour le diagnostic
-    console.log("Recruiter Email:", recruiterEmail);
-    console.log("Candidate Name:", candidateName);
-    console.log("Candidate CV:", candidateCV);
-
-    // Préparation de l'e-mail
+    // Preparing the email
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: recruiterEmail,
@@ -307,7 +298,7 @@ app.put("/api/approve-postulation", authenticate, async (req, res) => {
       ],
     };
 
-    // Envoi de l'e-mail
+    // Sending the email
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.log(error);
@@ -325,7 +316,7 @@ app.put("/api/approve-postulation", authenticate, async (req, res) => {
   }
 });
 
-// Fonction asynchrone pour créer les tables dans un ordre spécifique
+// Asynchrones function to create the tables in a specific order
 const createTables = async () => {
   try {
     await Recruiter.sync({ alter: true });
@@ -334,7 +325,7 @@ const createTables = async () => {
     await Administrator.sync({ alter: true });
     await Job.sync({ alter: true });
 
-    // Créer cette table en dernier à cause de ses dépendances avec les autres
+    // Creating of this table last because of its dependencies on the others
     await Postulation.sync({ alter: true });
     console.log("Table Postulation créée");
   } catch (error) {
@@ -342,7 +333,7 @@ const createTables = async () => {
   }
 };
 
-// Appel de la fonction pour créer les tables
+// Calling the function to create the tables
 createTables();
 
 export default app;

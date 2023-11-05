@@ -2,6 +2,7 @@ import Consultant from "../models/Consultant.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+// Retrieves all consultants from the database
 export const getConsultants = async (req, res) => {
   try {
     const consultants = await Consultant.findAll();
@@ -11,6 +12,7 @@ export const getConsultants = async (req, res) => {
   }
 };
 
+// Retrieves a consultant with the specified ID from the database
 export const getConsultantById = async (req, res) => {
   try {
     const consultant = await Consultant.findByPk(req.params.id);
@@ -20,6 +22,7 @@ export const getConsultantById = async (req, res) => {
   }
 };
 
+// Creates a new consultant in the database
 export const createConsultant = async (req, res) => {
   try {
     const consultant = await Consultant.create(req.body);
@@ -29,6 +32,7 @@ export const createConsultant = async (req, res) => {
   }
 };
 
+// Updates an existing consultant in the database
 export const updateConsultant = async (req, res) => {
   try {
     const consultant = await Consultant.findByPk(req.params.id);
@@ -43,6 +47,7 @@ export const updateConsultant = async (req, res) => {
   }
 };
 
+// Deletes a consultant from the database
 export const deleteConsultant = async (req, res) => {
   try {
     const consultant = await Consultant.findByPk(req.params.id);
@@ -57,6 +62,7 @@ export const deleteConsultant = async (req, res) => {
   }
 };
 
+// Logs in a consultant
 export const loginConsultant = async (req, res) => {
   try {
     const { email, password } = req.body;

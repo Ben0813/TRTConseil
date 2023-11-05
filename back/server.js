@@ -1,7 +1,7 @@
 import http from "http";
 import { default as app } from "./app.js";
 
-//create the server
+// Create the server
 const server = http.createServer(app);
 
 const normalizePort = (val) => {
@@ -17,11 +17,11 @@ const normalizePort = (val) => {
   return false;
 };
 
-//setting the port
+// Setting the port
 const port = normalizePort(process.env.PORT || "3001");
 app.set("port", port);
 
-//handle server errors
+// Handle server errors
 const errorHandler = (error) => {
   if (error.syscall !== "listen") {
     throw error;
@@ -43,7 +43,7 @@ const errorHandler = (error) => {
   }
 };
 
-//adding server event handlers
+// Adding server event handlers
 server.on("error", errorHandler);
 server.on("listening", () => {
   const address = server.address();

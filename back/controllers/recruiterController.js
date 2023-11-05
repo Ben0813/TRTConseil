@@ -2,6 +2,7 @@ import Recruiter from "../models/Recruiter.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+// Retrieves all recruiters from the database
 export const getRecruiters = async (req, res) => {
   try {
     const recruiters = await Recruiter.findAll();
@@ -11,6 +12,7 @@ export const getRecruiters = async (req, res) => {
   }
 };
 
+// Retrieves a recruiter with the specified ID from the database
 export const getRecruiterById = async (req, res) => {
   try {
     const recruiter = await Recruiter.findByPk(req.params.id);
@@ -20,6 +22,7 @@ export const getRecruiterById = async (req, res) => {
   }
 };
 
+// Creates a new recruiter in the database
 export const createRecruiter = async (req, res) => {
   console.log("Entrée dans createRecruiter");
   console.log("Données reçues:", req.body);
@@ -44,6 +47,7 @@ export const createRecruiter = async (req, res) => {
   }
 };
 
+// Updates an existing recruiter in the database
 export const updateRecruiter = async (req, res) => {
   try {
     const recruiter = await Recruiter.findByPk(req.params.id);
@@ -58,6 +62,7 @@ export const updateRecruiter = async (req, res) => {
   }
 };
 
+// Deletes a recruiter from the database
 export const deleteRecruiter = async (req, res) => {
   try {
     const recruiter = await Recruiter.findByPk(req.params.id);
@@ -72,6 +77,7 @@ export const deleteRecruiter = async (req, res) => {
   }
 };
 
+// Logs in a recruiter
 export const loginRecruiter = async (req, res) => {
   try {
     const { email, password } = req.body;

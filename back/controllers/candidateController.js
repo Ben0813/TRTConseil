@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import multer from "multer";
 
-// Configuration de Multer pour le stockage des fichiers
+// Creates a storage configuration object for handling file uploads using the multer library
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./uploads/");
@@ -15,6 +15,7 @@ const storage = multer.diskStorage({
 
 export const upload = multer({ storage: storage });
 
+// Retrieves all candidates from the database
 export const getCandidates = async (req, res) => {
   try {
     const candidates = await Candidate.findAll();
@@ -24,6 +25,7 @@ export const getCandidates = async (req, res) => {
   }
 };
 
+// Retrieves a candidate with the specified ID from the database
 export const getCandidateById = async (req, res) => {
   try {
     const candidate = await Candidate.findByPk(req.params.id);
@@ -33,6 +35,7 @@ export const getCandidateById = async (req, res) => {
   }
 };
 
+// Creates a new candidate in the database
 export const createCandidate = async (req, res) => {
   console.log("Entrée dans createCandidate");
   console.log("Données reçues:", req.body);
@@ -57,7 +60,7 @@ export const createCandidate = async (req, res) => {
   }
 };
 
-// Méthode updateCandidate
+// Updates an existing candidate in the database
 export const updateCandidate = async (req, res) => {
   try {
     const { id } = req.params;
@@ -83,6 +86,7 @@ export const updateCandidate = async (req, res) => {
   }
 };
 
+// Uploads a CV to the server
 export const uploadCV = async (req, res) => {
   const { id } = req.user;
   const cvPath = req.file.path;
@@ -95,6 +99,7 @@ export const uploadCV = async (req, res) => {
   }
 };
 
+// Deletes a candidate from the database
 export const deleteCandidate = async (req, res) => {
   try {
     const candidate = await Candidate.findByPk(req.params.id);
@@ -109,6 +114,7 @@ export const deleteCandidate = async (req, res) => {
   }
 };
 
+// Logs in a candidate
 export const loginCandidate = async (req, res) => {
   try {
     const { email, password } = req.body;

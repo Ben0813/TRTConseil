@@ -1,5 +1,6 @@
 import Postulation from "../models/Postulation.js";
 
+// Retrieves all postulations from the database
 export const getPostulations = async (req, res) => {
   try {
     const postulations = await Postulation.findAll();
@@ -9,6 +10,7 @@ export const getPostulations = async (req, res) => {
   }
 };
 
+// Retrieves a postulation with the specified ID from the database
 export const getPostulationById = async (req, res) => {
   try {
     const postulation = await Postulation.findByPk(req.params.id);
@@ -18,6 +20,7 @@ export const getPostulationById = async (req, res) => {
   }
 };
 
+// Creates a new postulation in the database
 export const createPostulation = async (req, res) => {
   try {
     const postulation = await Postulation.create(req.body);
@@ -27,6 +30,7 @@ export const createPostulation = async (req, res) => {
   }
 };
 
+// Updates an existing postulation in the database
 export const updatePostulation = async (req, res) => {
   try {
     const postulation = await Postulation.findByPk(req.params.id);
@@ -41,6 +45,7 @@ export const updatePostulation = async (req, res) => {
   }
 };
 
+// Deletes a postulation from the database
 export const deletePostulation = async (req, res) => {
   try {
     const postulation = await Postulation.findByPk(req.params.id);

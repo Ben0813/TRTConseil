@@ -1,5 +1,6 @@
 import Job from "../models/Job.js";
 
+// Retrieves all jobs from the database
 export const getJobs = async (req, res) => {
   try {
     const jobs = await Job.findAll();
@@ -9,6 +10,7 @@ export const getJobs = async (req, res) => {
   }
 };
 
+// Retrieves a job with the specified ID from the database
 export const getJobById = async (req, res) => {
   try {
     const job = await Job.findByPk(req.params.id);
@@ -18,6 +20,7 @@ export const getJobById = async (req, res) => {
   }
 };
 
+// Creates a new job in the database
 export const createJob = async (req, res) => {
   const { title, location, description, id_recruiter } = req.body;
   try {
@@ -34,6 +37,7 @@ export const createJob = async (req, res) => {
   }
 };
 
+// Updates an existing job in the database
 export const updateJob = async (req, res) => {
   try {
     const job = await Job.findByPk(req.params.id);
@@ -48,6 +52,7 @@ export const updateJob = async (req, res) => {
   }
 };
 
+// Deletes a job from the database
 export const deleteJob = async (req, res) => {
   try {
     const job = await Job.findByPk(req.params.id);
