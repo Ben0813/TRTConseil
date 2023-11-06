@@ -319,14 +319,14 @@ app.put("/api/approve-postulation", authenticate, async (req, res) => {
 // Asynchrones function to create the tables in a specific order
 const createTables = async () => {
   try {
-    await Recruiter.sync({ alter: true });
-    await Candidate.sync({ alter: true });
-    await Consultant.sync({ alter: true });
-    await Administrator.sync({ alter: true });
-    await Job.sync({ alter: true });
+    await Recruiter.sync({ alter: false });
+    await Candidate.sync({ alter: false });
+    await Consultant.sync({ alter: false });
+    await Administrator.sync({ alter: false });
+    await Job.sync({ alter: false });
 
     // Creating of this table last because of its dependencies on the others
-    await Postulation.sync({ alter: true });
+    await Postulation.sync({ alter: false });
     console.log("Table Postulation créée");
   } catch (error) {
     console.log(`Erreur lors de la création des tables : ${error}`);
