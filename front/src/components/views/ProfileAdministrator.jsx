@@ -18,6 +18,8 @@ const ProfileAdministrator = () => {
   // Navigate hook to redirect the user
   const navigate = useNavigate();
 
+  const baseUrl = import.meta.env.VITE_REACT_APP_API_URL;
+
   // Function to reset form fields to default empty values
   const resetForm = () => {
     setName("");
@@ -49,7 +51,8 @@ const ProfileAdministrator = () => {
   // Function to handle the creation of a new consultant account
   const handleCreateConsultant = async (e) => {
     e.preventDefault();
-    const url = "http://localhost:3001/api/consultants";
+    const url = `${baseUrl}/api/consultants`;
+
     try {
       const response = await axios.post(url, {
         name,

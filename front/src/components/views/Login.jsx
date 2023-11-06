@@ -12,6 +12,8 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [userType, setUserType] = useState("candidate");
 
+  const BaseUrl = import.meta.env.VITE_REACT_APP_API_URL;
+
   /** Function that handles the login of the user
    * It sends a POST request to the API with the user's credentials
    * If the login is successful, the user is redirected to the profile page
@@ -20,8 +22,8 @@ const Login = () => {
     e.preventDefault();
     try {
       // API endpoint for login, based on the user type
-      const endPoint = `http://localhost:3001/api/${userType}s/login`;
-      const response = await axios.post(endPoint, {
+      const url = `${BaseUrl}/api/${userType}s/login`;
+      const response = await axios.post(url, {
         email,
         password,
       });

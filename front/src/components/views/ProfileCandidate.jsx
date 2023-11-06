@@ -16,6 +16,8 @@ const ProfileCandidate = () => {
   const formRef = useRef(null);
   const [isApplied, setIsApplied] = useState({});
 
+  const baseUrl = import.meta.env.VITE_REACT_APP_API_URL;
+
   // Function to reset form fields to default empty values
   const resetForm = () => {
     setName("");
@@ -39,15 +41,14 @@ const ProfileCandidate = () => {
   // Effect hook to fetch approved jobs from the server
   useEffect(() => {
     const fetchApprovedJobs = async () => {
+      const url = `${baseUrl}/api/approved-jobs`;
+
       try {
-        const response = await axios.get(
-          "http://localhost:3001/api/approved-jobs",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
         setApprovedJobs(response.data);
       } catch (error) {
         console.error("Erreur lors du chargement des jobs validés:", error);
@@ -77,16 +78,13 @@ const ProfileCandidate = () => {
 
   // Function to update the candidate's profile
   const updateProfile = async (id, dataToUpdate) => {
+    const url = `${baseUrl}/api/candidates/${id}`;
     try {
-      const response = await axios.put(
-        `http://localhost:3001/api/candidates/${id}`,
-        dataToUpdate,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await axios.put(url, dataToUpdate, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       if (response.status === 200) {
         alert("Votre profil a été mis à jour avec succès.");
@@ -117,11 +115,11 @@ const ProfileCandidate = () => {
 
   // Function to handle job application
   const handleApply = async (jobId) => {
-    console.log("Tentative de postulation pour le job:", jobId);
+    const url = `${baseUrl}/api/postulations`;
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/api/postulations",
+        url,
         {
           id_candidate: id,
           id_job: jobId,

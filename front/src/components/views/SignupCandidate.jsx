@@ -11,6 +11,8 @@ const SignupCandidate = () => {
   const [password, setPassword] = useState("");
   const [cv, setCv] = useState("");
 
+  const baseUrl = import.meta.env.VITE_REACT_APP_API_URL;
+
   // Function to reset form fields to default empty values
   const resetForm = () => {
     setName("");
@@ -21,6 +23,7 @@ const SignupCandidate = () => {
 
   // Function to handle the creation of a new candidate account
   const handleSubmit = async (e) => {
+    const url = `${baseUrl}/api/candidates`;
     e.preventDefault();
     try {
       const data = {
@@ -34,10 +37,7 @@ const SignupCandidate = () => {
         data.cv = cv;
       }
 
-      const response = await axios.post(
-        "http://localhost:3001/api/candidates",
-        data
-      );
+      const response = await axios.post(url, data);
 
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);

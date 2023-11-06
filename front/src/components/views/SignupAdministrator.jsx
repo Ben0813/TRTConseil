@@ -11,6 +11,8 @@ const SignupAdministrator = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const baseUrl = import.meta.env.VITE_REACT_APP_API_URL;
+
   // Function to reset form fields to default empty values
   const resetForm = () => {
     setName("");
@@ -22,7 +24,7 @@ const SignupAdministrator = () => {
   // Function to handle the creation of a new administrator account
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const url = "http://localhost:3001/api/administrators";
+    const url = `${baseUrl}/api/administrators`;
     try {
       const response = await axios.post(url, {
         name,

@@ -8,6 +8,8 @@ const SignupRecruiter = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const baseUrl = import.meta.env.VITE_REACT_APP_API_URL;
+
   // Function to reset form fields to default empty values
   const resetForm = () => {
     setName("");
@@ -19,16 +21,14 @@ const SignupRecruiter = () => {
   // Function to handle the creation of a new recruiter account
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const url = `${baseUrl}/api/recruiters`;
     try {
-      const response = await axios.post(
-        "http://localhost:3001/api/recruiters",
-        {
-          name,
-          firstname,
-          email,
-          password,
-        }
-      );
+      const response = await axios.post(url, {
+        name,
+        firstname,
+        email,
+        password,
+      });
       alert(
         "Compte créé avec succès. Bienvenue ! Un Consultant va vérifier vos données avant de vous donner accès à la plateforme."
       );

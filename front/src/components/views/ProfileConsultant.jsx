@@ -13,6 +13,8 @@ const ProfileConsultant = () => {
   const [pendingJobs, setPendingJobs] = useState([]);
   const [pendingPostulations, setPendingPostulations] = useState([]);
 
+  const baseUrl = import.meta.env.VITE_REACT_APP_API_URL;
+
   // Effect hook to verify authentication and role before component mounts
   useEffect(() => {
     const isAuthenticated = localStorage.getItem("token") !== null;
@@ -26,15 +28,13 @@ const ProfileConsultant = () => {
   // Effect hook to fetch pending accounts from the server
   useEffect(() => {
     const fetchPendingAccounts = async () => {
+      const url = `${baseUrl}/api/pending-accounts`;
       try {
-        const response = await axios.get(
-          "http://localhost:3001/api/pending-accounts",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setPendingAccounts(response.data);
       } catch (error) {
         console.error(
@@ -50,15 +50,13 @@ const ProfileConsultant = () => {
   // Effect hook to fetch pending jobs from the server
   useEffect(() => {
     const fetchPendingJobs = async () => {
+      const url = `${baseUrl}/api/pending-jobs`;
       try {
-        const response = await axios.get(
-          "http://localhost:3001/api/pending-jobs",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setPendingJobs(response.data);
       } catch (error) {
         console.error("Erreur lors du chargement des jobs en attente:", error);
@@ -71,15 +69,13 @@ const ProfileConsultant = () => {
   // Effect hook to fetch pending postulations from the server
   useEffect(() => {
     const fetchPendingPostulations = async () => {
+      const url = `${baseUrl}/api/pending-postulations`;
       try {
-        const response = await axios.get(
-          "http://localhost:3001/api/pending-postulations",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setPendingPostulations(response.data);
       } catch (error) {
         console.error(
@@ -101,9 +97,10 @@ const ProfileConsultant = () => {
 
   // Function to toggle account approval
   const toggleApproval = async (id, type, isApproved) => {
+    const url = `${baseUrl}/api/approve-account`;
     try {
       const response = await axios.put(
-        "http://localhost:3001/api/approve-account",
+        url,
         {
           id,
           type,
@@ -132,9 +129,10 @@ const ProfileConsultant = () => {
 
   // Function to toggle job approval
   const toggleJobApproval = async (id, isApproved) => {
+    const url = `${baseUrl}/api/approve-job`;
     try {
       const response = await axios.put(
-        "http://localhost:3001/api/approve-job",
+        url,
         {
           id,
           isApproved: !isApproved,
@@ -160,9 +158,10 @@ const ProfileConsultant = () => {
 
   // Function to toggle postulation approval
   const togglePostulationApproval = async (id, isApproved) => {
+    const url = `${baseUrl}/api/approve-postulation`;
     try {
       const response = await axios.put(
-        "http://localhost:3001/api/approve-postulation",
+        url,
         {
           id,
           isApproved: !isApproved,

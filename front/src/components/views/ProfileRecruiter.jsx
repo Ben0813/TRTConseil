@@ -23,6 +23,8 @@ const ProfileRecruiter = () => {
   const [updateStatus, setUpdateStatus] = useState("");
   const [postStatus, setPostStatus] = useState("");
 
+  const baseUrl = import.meta.env.VITE_REACT_APP_API_URL;
+
   // Effect hook to verify authentication and role before component mounts
   useEffect(() => {
     const isAuthenticated = localStorage.getItem("token") !== null;
@@ -43,10 +45,9 @@ const ProfileRecruiter = () => {
   // Fetches the ID of the recruiter from the API
   useEffect(() => {
     const fetchRecruiterId = async () => {
+      const url = `${baseUrl}/api/recruiters`;
       try {
-        const response = await axios.get(
-          "http://localhost:3001/api/recruiters"
-        );
+        const response = await axios.get(url);
         setRecruiterId(response.data[0].id);
       } catch (error) {
         console.error(
@@ -62,8 +63,9 @@ const ProfileRecruiter = () => {
   // Fetches the list of jobs from the API
   useEffect(() => {
     const fetchJobs = async () => {
+      const url = `${baseUrl}/api/jobs`;
       try {
-        const response = await axios.get("http://localhost:3001/api/jobs");
+        const response = await axios.get(url);
         setJobs(response.data);
       } catch (error) {
         console.error("Erreur lors de la récupération des jobs:", error);
@@ -76,10 +78,9 @@ const ProfileRecruiter = () => {
   // Fetches the list of candidates from the API
   useEffect(() => {
     const fetchCandidates = async () => {
+      const url = `${baseUrl}/api/candidates`;
       try {
-        const response = await axios.get(
-          "http://localhost:3001/api/candidates"
-        );
+        const response = await axios.get(url);
         setCandidates(response.data);
       } catch (error) {
         console.error("Erreur lors de la récupération des candidats:", error);
@@ -94,16 +95,14 @@ const ProfileRecruiter = () => {
 
     // Fetches jobs by the recruiter and their associated postulations
     const fetchJobsByRecruiter = async () => {
+      const url = `${baseUrl}/api/jobs/byRecruiter/${recruiterId}`;
       try {
-        const response = await axios.get(
-          `http://localhost:3001/api/jobs/byRecruiter/${recruiterId}`
-        );
+        const response = await axios.get(url);
         const jobsWithPostulations = await Promise.all(
           response.data.map(async (job) => {
+            const url = `${baseUrl}/api/postulations/byJob/${job.id}`;
             try {
-              const postulationsResponse = await axios.get(
-                `http://localhost:3001/api/postulations/byJob/${job.id}`
-              );
+              const postulationsResponse = await axios.get(url);
               return {
                 ...job,
                 postulations: postulationsResponse.data || [],
@@ -135,20 +134,17 @@ const ProfileRecruiter = () => {
 
   // Function to update the recruiter's profile
   const updateRecruiterProfile = async () => {
+    const url = `${baseUrl}/api/recruiters/${recruiterId}`;
     try {
       const payload = {
         company: companyName,
         address: address,
       };
-      const response = await axios.put(
-        `http://localhost:3001/api/recruiters/${recruiterId}`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await axios.put(url, payload, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       if (response.status === 200) {
         setUpdateStatus("Profil mis à jour avec succès.");
         console.log(
@@ -176,6 +172,7 @@ const ProfileRecruiter = () => {
   // Function to handle job posting
   const handleJobPost = async (e) => {
     e.preventDefault();
+    const url = `${baseUrl}/api/jobs`;
     const payload = {
       title: jobTitle,
       location: jobLocation,
@@ -184,15 +181,11 @@ const ProfileRecruiter = () => {
       isApproved: false,
     };
     try {
-      const response = await axios.post(
-        "http://localhost:3001/api/jobs",
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await axios.post(url, payload, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       if (response.status === 201) {
         setPostStatus("Annonce publiée avec succès.");
         console.log("Annonce publiée avec succès:", response.data);
