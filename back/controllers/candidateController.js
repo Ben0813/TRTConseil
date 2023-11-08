@@ -67,16 +67,6 @@ export const createCandidate = [
 // Updates an existing candidate in the database
 export const updateCandidate = [
   param("id").isUUID().withMessage("L'ID doit être un UUID valide"),
-  body("name")
-    .optional()
-    .trim()
-    .notEmpty()
-    .withMessage("Le nom ne peut pas être vide."),
-  body("firstname")
-    .optional()
-    .trim()
-    .notEmpty()
-    .withMessage("Le prénom ne peut pas être vide."),
 
   async (req, res) => {
     const errors = validationResult(req);
