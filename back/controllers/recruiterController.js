@@ -31,8 +31,8 @@ export const createRecruiter = [
     .isEmail()
     .withMessage("L'email doit être une adresse email valide."),
   body("password")
-    .isLength({ min: 6 })
-    .withMessage("Le mot de passe doit contenir au moins 6 caractères."),
+    .isStrongPassword()
+    .withMessage("Le mot de passe n'est pas assez sécurisé."),
 
   async (req, res) => {
     const errors = validationResult(req);
