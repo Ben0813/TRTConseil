@@ -89,7 +89,6 @@ const ProfileCandidate = () => {
       if (response.status === 200) {
         alert("Votre profil a été mis à jour avec succès.");
         resetForm();
-        console.log("Profil mis à jour avec succès", response.data);
       }
     } catch (error) {
       console.error("Erreur lors de la mise à jour du profil:", error);
@@ -130,8 +129,6 @@ const ProfileCandidate = () => {
           },
         }
       );
-
-      console.log("Réponse du serveur:", response);
 
       if (response.status >= 200 && response.status < 300) {
         alert("Vous avez postulé avec succès à l'emploi.");

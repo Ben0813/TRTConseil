@@ -7,6 +7,7 @@ const SignupRecruiter = () => {
   const [firstname, setFirstname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const baseUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
@@ -34,8 +35,9 @@ const SignupRecruiter = () => {
       );
       resetForm();
     } catch (error) {
-      console.error("Erreur lors de la création du compte:", error);
-      alert("Erreur lors de la création du compte. Veuillez réessayer.");
+      const errors = error.response.data.errors;
+      const message = errors.map((err) => err.msg).join(" ");
+      setErrorMessage(message);
     }
   };
 
@@ -71,6 +73,14 @@ const SignupRecruiter = () => {
             onChange={(e) => setPassword(e.target.value)}
             className="p-2 rounded bg-gray-700 w-full mb-4"
           />
+          {errorMessage && (
+            <div
+              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+              role="alert"
+            >
+              {errorMessage}
+            </div>
+          )}
           <button type="submit" className="bg-green-500 p-2 rounded w-full">
             S'inscrire
           </button>

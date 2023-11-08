@@ -34,16 +34,11 @@ const Login = () => {
       localStorage.setItem("role", userType);
       localStorage.setItem("userType", userType);
       localStorage.setItem("id", id);
-      console.log("ID stocké dans le localStorage: ", id);
 
       if (userType === "candidate") {
-        console.log("Navigation to profile-candidate");
         navigate("/profile-candidate");
-        console.log("Should have navigated to profile-candidate");
       } else if (userType === "recruiter") {
-        console.log("Navigation to profile-recruiter");
         navigate("/profile-recruiter");
-        console.log("Should have navigated to profile-recruiter");
       } else if (userType === "administrator") {
         navigate("/profile-administrator");
       } else if (userType === "consultant") {

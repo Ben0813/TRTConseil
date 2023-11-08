@@ -147,10 +147,6 @@ const ProfileRecruiter = () => {
       });
       if (response.status === 200) {
         setUpdateStatus("Profil mis à jour avec succès.");
-        console.log(
-          "Profil de recruteur mis à jour avec succès",
-          response.data
-        );
       }
     } catch (error) {
       setUpdateStatus(
@@ -188,7 +184,6 @@ const ProfileRecruiter = () => {
       });
       if (response.status === 201) {
         setPostStatus("Annonce publiée avec succès.");
-        console.log("Annonce publiée avec succès:", response.data);
       }
     } catch (error) {
       setPostStatus(

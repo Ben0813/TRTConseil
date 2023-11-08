@@ -2,6 +2,7 @@ import Candidate from "../models/Candidate.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import multer from "multer";
+import { body, param, validationResult } from "express-validator";
 
 // Creates a storage configuration object for handling file uploads using the multer library
 const storage = multer.diskStorage({
@@ -36,55 +37,79 @@ export const getCandidateById = async (req, res) => {
 };
 
 // Creates a new candidate in the database
-export const createCandidate = async (req, res) => {
-  console.log("Entrée dans createCandidate");
-  console.log("Données reçues:", req.body);
-
-  const { name, firstname, email, password } = req.body;
-  if (!name || !firstname || !email || !password) {
-    return res.status(400).json({ message: "Tous les champs sont requis." });
-  }
-
-  try {
-    const candidate = await Candidate.create({
-      ...req.body,
-      isApproved: false,
-    });
-    res.status(201).json({ id: candidate.id });
-  } catch (err) {
-    console.log("Erreur:", err);
-    if (err.name === "SequelizeUniqueConstraintError") {
-      return res.status(400).json({ message: "Email déjà utilisé." });
+export const createCandidate = [
+  body("name").trim().notEmpty().withMessage("Le nom est requis."),
+  body("firstname").trim().notEmpty().withMessage("Le prénom est requis."),
+  body("email")
+    .isEmail()
+    .withMessage("L'email doit être une adresse email valide."),
+  body("password")
+    .isLength({ min: 6 })
+    .withMessage("Le mot de passe doit contenir au moins 6 caractères."),
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-    res.status(500).json({ message: "Une erreur interne s'est produite." });
-  }
-};
+
+    try {
+      const candidate = await Candidate.create({
+        ...req.body,
+        isApproved: false,
+      });
+      res.status(201).json({ id: candidate.id });
+    } catch (err) {
+      res.status(500).json({ message: "Une erreur interne s'est produite." });
+    }
+  },
+];
 
 // Updates an existing candidate in the database
-export const updateCandidate = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { name, firstname } = req.body;
-    const cv = req.file;
+export const updateCandidate = [
+  param("id").isUUID().withMessage("L'ID doit être un UUID valide"),
+  body("name")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("Le nom ne peut pas être vide."),
+  body("firstname")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("Le prénom ne peut pas être vide."),
 
-    const candidate = await Candidate.findByPk(id);
-
-    if (!candidate) {
-      return res.status(404).json({ message: "Candidat non trouvé" });
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
-    if (name) candidate.name = name;
-    if (firstname) candidate.firstname = firstname;
-    if (cv) candidate.cvPath = cv.path;
+    try {
+      const { id } = req.params;
+      const { name, firstname } = req.body;
+      const cv = req.file;
 
-    await candidate.save();
-    res
-      .status(200)
-      .json({ message: "Profil mis à jour avec succès", candidate });
-  } catch (error) {
-    res.status(500).json({ error: "Erreur lors de la mise à jour du profil" });
-  }
-};
+      const candidate = await Candidate.findByPk(id);
+
+      if (!candidate) {
+        return res.status(404).json({ message: "Candidat non trouvé" });
+      }
+
+      if (name) candidate.name = name;
+      if (firstname) candidate.firstname = firstname;
+      if (cv) candidate.cvPath = cv.path;
+
+      await candidate.save();
+      res
+        .status(200)
+        .json({ message: "Profil mis à jour avec succès", candidate });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ error: "Erreur lors de la mise à jour du profil" });
+    }
+  },
+];
 
 // Uploads a CV to the server
 export const uploadCV = async (req, res) => {

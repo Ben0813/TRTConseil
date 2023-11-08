@@ -1,6 +1,7 @@
 import Administrator from "../models/Administrator.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { body, param, validationResult } from "express-validator";
 
 // Retrieves all administrators from the database
 export const getAdministrators = async (req, res) => {
@@ -23,29 +24,64 @@ export const getAdministratorById = async (req, res) => {
 };
 
 // Creates a new administrator in the database
-export const createAdministrator = async (req, res) => {
-  try {
-    const administrator = await Administrator.create(req.body);
-    res.status(201).json({ id: administrator.id });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+export const createAdministrator = [
+  body("name").trim().notEmpty().withMessage("Le nom est requis."),
+  body("firstname").trim().notEmpty().withMessage("Le prénom est requis."),
+  body("email")
+    .isEmail()
+    .withMessage("L'email doit être une adresse email valide."),
+  body("password")
+    .isStrongPassword()
+    .withMessage("Le mot de passe n'est pas assez sécurisé."),
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      const administrator = await Administrator.create(req.body);
+      res.status(201).json({ id: administrator.id });
+    } catch (err) {
+      res.status(500).json({ message: "Une erreur interne s'est produite." });
+    }
+  },
+];
 
 // Updates an existing administrator in the database
-export const updateAdministrator = async (req, res) => {
-  try {
-    const administrator = await Administrator.findByPk(req.params.id);
-    if (administrator) {
-      await administrator.update(req.body);
-      res.status(200).json({ id: administrator.id });
-    } else {
-      res.status(404).json({ message: "Administrator not found" });
+export const updateAdministrator = [
+  param("id").isUUID().withMessage("L'ID doit être un UUID valide"),
+
+  body("email")
+    .optional()
+    .isEmail()
+    .withMessage("L'email doit être une adresse email valide."),
+  body("password")
+    .optional()
+    .isStrongPassword()
+    .withMessage("Le mot de passe n'est pas assez sécurisé."),
+
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+
+    try {
+      const administrator = await Administrator.findByPk(req.params.id);
+      if (administrator) {
+        await administrator.update(req.body);
+        res.status(200).json({ id: administrator.id });
+      } else {
+        res.status(404).json({ message: "Administrateur non trouvé" });
+      }
+    } catch (err) {
+      res.status(500).json({
+        message: "Une erreur interne s'est produite lors de la mise à jour.",
+      });
+    }
+  },
+];
 
 // Deletes an administrator from the database
 export const deleteAdministrator = async (req, res) => {
@@ -55,7 +91,7 @@ export const deleteAdministrator = async (req, res) => {
       await administrator.destroy();
       res.status(200).json({ id: administrator.id });
     } else {
-      res.status(404).json({ message: "Administrator not found" });
+      res.status(404).json({ message: "Administrateur non trouvé" });
     }
   } catch (err) {
     res.status(500).json({ message: err.message });

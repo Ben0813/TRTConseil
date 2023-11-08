@@ -5,7 +5,6 @@ import session from "express-session";
 import dotenv from "dotenv";
 import authenticate from "./middleware/authenticate.js";
 import nodemailer from "nodemailer";
-import { body, validationResult, param } from "express-validator";
 
 dotenv.config();
 
@@ -110,62 +109,39 @@ app.get("/api/pending-accounts", authenticate, async (req, res) => {
   }
 });
 
-app.put(
-  "/api/approve-account",
-  authenticate,
-  [
-    body("id").isUUID().withMessage("L'ID doit être un UUID valide"),
-    body("type")
-      .isIn(["candidate", "recruiter"])
-      .withMessage("Type de compte inconnu"),
-    body("isApproved")
-      .isBoolean()
-      .withMessage("Le statut d'approbation doit être un booléen"),
-  ],
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+app.put("/api/approve-account", authenticate, async (req, res) => {
+  const { id, type, isApproved } = req.body;
+  try {
+    if (type === "candidate") {
+      await Candidate.update({ isApproved }, { where: { id } });
+    } else if (type === "recruiter") {
+      await Recruiter.update({ isApproved }, { where: { id } });
+    } else {
+      return res.status(400).json({ error: "Type de compte inconnu." });
     }
-
-    const { id, type, isApproved } = req.body;
-    try {
-      const model = type === "candidate" ? Candidate : Recruiter;
-      await model.update({ isApproved }, { where: { id } });
-      res.json({ message: "Statut du compte mis à jour avec succès." });
-    } catch (error) {
-      res
-        .status(500)
-        .json({ error: "Erreur lors de la mise à jour du statut du compte." });
-    }
+    res.json({ message: "Statut du compte mis à jour avec succès." });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la mise à jour du statut du compte." });
   }
-);
+});
 
-app.post(
-  "/api/reject-account",
-  authenticate,
-  [
-    body("id").isUUID().withMessage("L'ID doit être un UUID valide"),
-    body("type")
-      .isIn(["candidate", "recruiter"])
-      .withMessage("Type de compte inconnu"),
-  ],
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+app.post("/api/reject-account", authenticate, async (req, res) => {
+  const { id, type } = req.body;
+  try {
+    if (type === "candidate") {
+      await Candidate.destroy({ where: { id } });
+    } else if (type === "recruiter") {
+      await Recruiter.destroy({ where: { id } });
+    } else {
+      return res.status(400).json({ error: "Type de compte inconnu." });
     }
-
-    const { id, type } = req.body;
-    try {
-      const model = type === "candidate" ? Candidate : Recruiter;
-      await model.destroy({ where: { id } });
-      res.json({ message: "Compte rejeté avec succès." });
-    } catch (error) {
-      res.status(500).json({ error: "Erreur lors du rejet du compte." });
-    }
+    res.json({ message: "Compte rejeté avec succès." });
+  } catch (error) {
+    res.status(500).json({ error: "Erreur lors du rejet du compte." });
   }
-);
+});
 
 app.get("/api/pending-jobs", authenticate, async (req, res) => {
   try {
@@ -176,32 +152,17 @@ app.get("/api/pending-jobs", authenticate, async (req, res) => {
   }
 });
 
-app.put(
-  "/api/approve-job",
-  authenticate,
-  [
-    body("id").isUUID().withMessage("L'ID doit être un UUID valide"),
-    body("isApproved")
-      .isBoolean()
-      .withMessage("Le statut d'approbation doit être un booléen"),
-  ],
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { id, isApproved } = req.body;
-    try {
-      await Job.update({ isApproved }, { where: { id } });
-      res.json({ message: "Statut du job mis à jour avec succès." });
-    } catch (error) {
-      res
-        .status(500)
-        .json({ error: "Erreur lors de la mise à jour du statut du job." });
-    }
+app.put("/api/approve-job", authenticate, async (req, res) => {
+  const { id, isApproved } = req.body;
+  try {
+    await Job.update({ isApproved }, { where: { id } });
+    res.json({ message: "Statut du job mis à jour avec succès." });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la mise à jour du statut du job." });
   }
-);
+});
 
 app.get("/api/approved-jobs", authenticate, async (req, res) => {
   try {
@@ -214,90 +175,48 @@ app.get("/api/approved-jobs", authenticate, async (req, res) => {
   }
 });
 
-app.get(
-  "/api/jobs/byRecruiter/:recruiterId",
-  [
-    param("recruiterId")
-      .isUUID()
-      .withMessage("L'ID du recruteur doit être un UUID valide"),
-  ],
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    try {
-      const recruiterId = req.params.recruiterId;
-      const jobs = await Job.findAll({
-        where: { id_recruiter: recruiterId },
-      });
-      res.json(jobs);
-    } catch (error) {
-      res
-        .status(500)
-        .json({ error: "Erreur lors de la récupération des jobs." });
-    }
+app.get("/api/jobs/byRecruiter/:recruiterId", async (req, res) => {
+  try {
+    const recruiterId = req.params.recruiterId;
+    const jobs = await Job.findAll({
+      where: { id_recruiter: recruiterId },
+    });
+    res.json(jobs);
+  } catch (error) {
+    res.status(500).json({ error: "Erreur lors de la récupération des jobs." });
   }
-);
+});
 
-app.get(
-  "/api/postulations/byJob/:jobId",
-  [
-    param("jobId").isUUID().withMessage("L'ID du job doit être un UUID valide"),
-    authenticate,
-  ],
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    try {
-      const jobId = req.params.jobId;
-      const postulations = await Postulation.findAll({
-        where: { id_job: jobId },
-        include: [
-          { model: Candidate, as: "candidate", attributes: ["name"] },
-          { model: Job, as: "job", attributes: ["title"] },
-        ],
-      });
-      res.json(postulations);
-    } catch (error) {
-      console.error(error);
-      res
-        .status(500)
-        .json({ error: "Erreur lors de la récupération des postulations." });
-    }
+app.get("/api/postulations/byJob/:jobId", async (req, res) => {
+  try {
+    const jobId = req.params.jobId;
+    const postulations = await Postulation.findAll({
+      where: { id_job: jobId },
+      include: [
+        { model: Candidate, as: "candidate", attributes: ["name"] },
+        { model: Job, as: "job", attributes: ["title"] },
+      ],
+    });
+    res.json(postulations);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la récupération des postulations." });
   }
-);
+});
 
-app.post(
-  "/api/postulations",
-  authenticate,
-  [
-    body("id_candidate")
-      .isUUID()
-      .withMessage("L'ID du candidat doit être un UUID valide"),
-    body("id_job").isUUID().withMessage("L'ID du job doit être un UUID valide"),
-  ],
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { id_candidate, id_job } = req.body;
-    try {
-      const newPostulation = await Postulation.create({ id_candidate, id_job });
-      res.status(200).json(newPostulation);
-    } catch (error) {
-      res
-        .status(500)
-        .json({ error: "Erreur lors de la création de la postulation." });
-    }
+app.post("/api/postulations", authenticate, async (req, res) => {
+  const { id_candidate, id_job } = req.body;
+  try {
+    const newPostulation = await Postulation.create({ id_candidate, id_job });
+    res.status(200).json(newPostulation);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la création de la postulation." });
   }
-);
+});
 
 app.get("/api/pending-postulations", authenticate, async (req, res) => {
   try {

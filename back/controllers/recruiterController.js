@@ -1,6 +1,7 @@
 import Recruiter from "../models/Recruiter.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { body, param, validationResult } from "express-validator";
 
 // Retrieves all recruiters from the database
 export const getRecruiters = async (req, res) => {
@@ -23,44 +24,78 @@ export const getRecruiterById = async (req, res) => {
 };
 
 // Creates a new recruiter in the database
-export const createRecruiter = async (req, res) => {
-  console.log("Entrée dans createRecruiter");
-  console.log("Données reçues:", req.body);
+export const createRecruiter = [
+  body("name").trim().notEmpty().withMessage("Le nom est requis."),
+  body("firstname").trim().notEmpty().withMessage("Le prénom est requis."),
+  body("email")
+    .isEmail()
+    .withMessage("L'email doit être une adresse email valide."),
+  body("password")
+    .isLength({ min: 6 })
+    .withMessage("Le mot de passe doit contenir au moins 6 caractères."),
 
-  const { name, firstname, email, password, cv } = req.body;
-  if (!name || !firstname || !email || !password) {
-    return res.status(400).json({ message: "Tous les champs sont requis." });
-  }
-
-  try {
-    const recruiter = await Recruiter.create({
-      ...req.body,
-      isApproved: false,
-    });
-    res.status(201).json({ id: recruiter.id });
-  } catch (err) {
-    console.log("Erreur:", err);
-    if (err.name === "SequelizeUniqueConstraintError") {
-      return res.status(400).json({ message: "Email déjà utilisé." });
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-    res.status(500).json({ message: "Une erreur interne s'est produite." });
-  }
-};
+
+    try {
+      const recruiter = await Recruiter.create({
+        ...req.body,
+        isApproved: false,
+      });
+      res.status(201).json({ id: recruiter.id });
+    } catch (err) {
+      if (err.name === "SequelizeUniqueConstraintError") {
+        return res.status(400).json({ message: "Email déjà utilisé." });
+      }
+
+      res.status(500).json({
+        message:
+          "Une erreur interne s'est produite lors de la création du recruteur.",
+      });
+    }
+  },
+];
 
 // Updates an existing recruiter in the database
-export const updateRecruiter = async (req, res) => {
-  try {
-    const recruiter = await Recruiter.findByPk(req.params.id);
-    if (recruiter) {
-      await recruiter.update(req.body);
-      res.status(200).json({ id: recruiter.id });
-    } else {
-      res.status(404).json({ message: "Recruiter not found" });
+export const updateRecruiter = [
+  param("id").isUUID().withMessage("L'ID doit être un UUID valide"),
+
+  body("company")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("Le nom de l'entreprise ne peut pas être vide."),
+  body("address")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("L'adresse ne peut pas être vide."),
+
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+
+    try {
+      const recruiter = await Recruiter.findByPk(req.params.id);
+      if (recruiter) {
+        await recruiter.update(req.body);
+        res.status(200).json({ id: recruiter.id });
+      } else {
+        res.status(404).json({ message: "Recruteur non trouvé" });
+      }
+    } catch (err) {
+      res.status(500).json({
+        message:
+          "Une erreur interne s'est produite lors de la mise à jour du recruteur.",
+      });
+    }
+  },
+];
 
 // Deletes a recruiter from the database
 export const deleteRecruiter = async (req, res) => {
